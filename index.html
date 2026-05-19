@@ -1059,12 +1059,14 @@ function renderCats(cats){
     el.onclick=()=>{
       list.querySelectorAll('.cat-item').forEach(x=>x.classList.remove('active'));
       el.classList.add('active');
+      const _sec=catSection;  // capture BEFORE closeCatPanel() zeroes catSection
       closeCatPanel();
-      loadCatItems(catSection,c.category_id,c.category_name);
+      loadCatItems(_sec,c.category_id,c.category_name);
     };
     list.appendChild(el);
   });
 }
+
 
 async function loadCatItems(sec,catId,catName){
   document.getElementById('content-title').textContent=catName;
