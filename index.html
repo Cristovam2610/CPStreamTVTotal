@@ -547,6 +547,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       <div id="item-count"></div>
     </div>
     <div id="content-body">
+      <div id="msg-area" style="display:none"></div>
       <div id="ch-grid-wrap" style="display:none"><div class="ch-grid" id="ch-grid"></div></div>
       <div id="vod-grid-wrap" style="display:none"><div class="vod-grid" id="vod-grid"></div></div>
     </div>
@@ -1033,9 +1034,8 @@ async function openCatSection(sec){
 
   // Show invite to pick category
   document.getElementById('content-title').textContent=meta.label;
-  document.getElementById('ch-grid-wrap').style.display='none';
-  document.getElementById('vod-grid-wrap').style.display='none';
-  document.getElementById('content-body').innerHTML=`<div class="g-msg"><div class="g-icon">${meta.icon}</div><p>Selecione uma categoria</p></div>`;
+  setGridsVisible(false,false);
+  showMsgArea(`<div class="g-msg"><div class="g-icon">${meta.icon}</div><p>Selecione uma categoria</p></div>`);
   document.getElementById('item-count').textContent='';
 }
 
@@ -1099,13 +1099,10 @@ function goFavsSection(){
 
 function showFavsGrid(){
   const body=document.getElementById('content-body');
-  const cgw=document.getElementById('ch-grid-wrap');
-  const vgw=document.getElementById('vod-grid-wrap');
-  if(!cgw||!vgw||!body)return;
-  cgw.style.display='none';
-  vgw.style.display='none';
+  if(!body)return;
   if(!favorites.length){
-    body.innerHTML='<div class="g-msg"><div class="g-icon">⭐</div><p>Sem favoritos ainda.<br>Pressione <b>F</b> num canal ou filme para favoritar.</p></div>';
+    setGridsVisible(false,false);
+    showMsgArea('<div class="g-msg"><div class="g-icon">⭐</div><p>Sem favoritos ainda.<br>Pressione <b>F</b> num canal ou filme para favoritar.</p></div>');
     document.getElementById('item-count').textContent='0 favoritos';
     return;
   }
@@ -1113,10 +1110,10 @@ function showFavsGrid(){
   const hasLive=favorites.some(f=>f.type==='live');
   const hasVOD=favorites.some(f=>f.type!=='live');
   if(hasLive&&!hasVOD){
-    document.getElementById('ch-grid-wrap').style.display='block';
+    setGridsVisible(true,false);
     renderFavChannels();
   } else {
-    document.getElementById('vod-grid-wrap').style.display='block';
+    setGridsVisible(false,true);
     renderFavVOD();
   }
 }
@@ -1160,11 +1157,14 @@ function goHistorySection(){
 }
 
 function showHistoryGrid(){
-  document.getElementById('ch-grid-wrap').style.display='none';
-  document.getElementById('vod-grid-wrap').style.display='none';
-  const body=document.getElementById('content-body');body.innerHTML='';
-  if(!watchHistory.length){body.innerHTML='<div class="g-msg"><div class="g-icon">🕓</div><p>Sem histórico ainda.</p></div>';document.getElementById('item-count').textContent='0 itens';return;}
+  setGridsVisible(false,false);
+  const body=document.getElementById('content-body');
+  if(!body)return;
+  if(!watchHistory.length){showMsgArea('<div class="g-msg"><div class="g-icon">🕓</div><p>Sem histórico ainda.</p></div>');document.getElementById('item-count').textContent='0 itens';return;}
   document.getElementById('item-count').textContent=watchHistory.length+' itens';
+  // Clear msg area and show content directly in body
+  const ma=document.getElementById('msg-area');if(ma)ma.style.display='none';
+  body.querySelectorAll(':scope>div:not(#msg-area):not(#ch-grid-wrap):not(#vod-grid-wrap)').forEach(el=>el.remove());
   const wrap=document.createElement('div');wrap.style.cssText='display:flex;flex-direction:column;gap:9px;';
   [...watchHistory].reverse().forEach(h=>{
     const row=document.createElement('div');
@@ -1220,8 +1220,7 @@ function renderItems(sec,list){
 }
 
 function renderChannels(list){
-  document.getElementById('ch-grid-wrap').style.display='block';
-  document.getElementById('vod-grid-wrap').style.display='none';
+  setGridsVisible(true,false);
   const grid=document.getElementById('ch-grid');grid.innerHTML='';
   if(!list.length){grid.innerHTML='<div class="g-msg"><div class="g-icon">📭</div><p>Nenhum canal</p></div>';return;}
   list.forEach((ch,i)=>{
@@ -1234,8 +1233,7 @@ function renderChannels(list){
 }
 
 function renderVOD(list,sec){
-  document.getElementById('ch-grid-wrap').style.display='none';
-  document.getElementById('vod-grid-wrap').style.display='block';
+  setGridsVisible(false,true);
   const grid=document.getElementById('vod-grid');grid.innerHTML='';
   if(!list.length){grid.innerHTML='<div class="g-msg"><div class="g-icon">📭</div><p>Nenhum título</p></div>';return;}
   const icon=sec==='series'?'📽':'🎬';
@@ -1258,8 +1256,25 @@ function onSearch(q){
   if(SECTION==='live')renderChannels(visItems);else renderVOD(visItems,SECTION);
 }
 
-function showBodyLoading(){document.getElementById('ch-grid-wrap').style.display='none';document.getElementById('vod-grid-wrap').style.display='none';document.getElementById('content-body').innerHTML='<div class="g-msg"><div class="spinner-sm"></div><p>Carregando...</p></div>';}
-function showBodyMsg(icon,msg){document.getElementById('content-body').innerHTML=`<div class="g-msg"><div class="g-icon">${icon}</div><p>${msg}</p></div>`;}
+
+// ── Grid / Message area helpers (never destroy grids with innerHTML)
+function setGridsVisible(ch,vod){
+  const cw=document.getElementById('ch-grid-wrap');
+  const vw=document.getElementById('vod-grid-wrap');
+  const ma=document.getElementById('msg-area');
+  if(cw)cw.style.display=ch?'block':'none';
+  if(vw)vw.style.display=vod?'block':'none';
+  if(ma)ma.style.display=(ch||vod)?'none':'block';
+}
+function showMsgArea(html){
+  const ma=document.getElementById('msg-area');
+  if(ma){ma.innerHTML=html;ma.style.display='block';}
+}
+function showBodyLoading(){
+  setGridsVisible(false,false);
+  showMsgArea('<div class="g-msg"><div class="spinner-sm"></div><p>Carregando...</p></div>');
+}
+function showBodyMsg(icon,msg){setGridsVisible(false,false);showMsgArea(`<div class="g-msg"><div class="g-icon">${icon}</div><p>${msg}</p></div>`);}
 
 // ══════════════════════════════════════════════════════════════
 // FAVORITES
