@@ -701,6 +701,10 @@ const ADMIN_HASH=hashPwd('Porto@legre1965');
 function getDeviceId(){let d=tvGet('stv_device');if(!d){d='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);tvSet('stv_device',d);}return d;}
 const DEVICE_ID=getDeviceId();
 
+// ── Credenciais IPTV padrão (fixas no código — editáveis pelo Admin)
+const DEFAULT_IPTV_USER='venrkdml7n02';
+const DEFAULT_IPTV_PASS='71985344834';
+
 // ── Global state
 let currentUser=null,isAdmin=false,sessionDocId=null,serverConfigs=null;
 let CFG={server:'',user:'',pass:'',isM3U:false};
@@ -872,16 +876,21 @@ async function loadServerConfigs(){
   if(serverConfigs)return;
   try{
     const doc=await Promise.race([db.collection('config').doc('servers').get(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),4000))]);
-    if(doc.exists){serverConfigs=doc.data();_cacheSrv();return;}
+    if(doc.exists){
+      serverConfigs=doc.data();
+      // Garante credenciais padrão em qualquer servidor sem credenciais no Firebase
+      for(let i=0;i<5;i++){const k='s'+i;if(!serverConfigs[k])serverConfigs[k]={};if(!serverConfigs[k].iptv_user)serverConfigs[k].iptv_user=DEFAULT_IPTV_USER;if(!serverConfigs[k].iptv_pass)serverConfigs[k].iptv_pass=DEFAULT_IPTV_PASS;}
+      _cacheSrv();return;
+    }
   }catch(_){}
   try{const ls=JSON.parse(tvGet('stv_srv_cfg')||'null');if(ls){serverConfigs=ls;return;}}catch(_){}
-  // Default 5 servers
+  // Default 5 servers com credenciais fixas como padrão
   serverConfigs={
-    s0:{url:'https://toppcard.fun',     iptv_user:'',iptv_pass:'',enabled:true},
-    s1:{url:'http://streams4k.xyz',     iptv_user:'',iptv_pass:'',enabled:true},
-    s2:{url:'https://pedidoonline.space',iptv_user:'',iptv_pass:'',enabled:true},
-    s3:{url:'https://adplayer.online',  iptv_user:'',iptv_pass:'',enabled:true},
-    s4:{url:'',                         iptv_user:'',iptv_pass:'',enabled:false},
+    s0:{url:'https://toppcard.fun',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s1:{url:'http://streams4k.xyz',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s2:{url:'https://pedidoonline.space', iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s3:{url:'https://adplayer.online',   iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s4:{url:'',                          iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:false},
   };
   _cacheSrv();
 }
@@ -944,17 +953,17 @@ function renderSrvEditor(){
   const ed=document.getElementById('srv-editor');ed.innerHTML='';
   const labels=['S1','S2','S3','S4','S5'];
   for(let i=0;i<5;i++){
-    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:'',iptv_pass:'',enabled:true};
+    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true};
     const on=s.enabled!==false;
     const div=document.createElement('div');div.className='srv-block';
-    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||'')}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||'')}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
+    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||DEFAULT_IPTV_USER)}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||DEFAULT_IPTV_PASS)}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
     ed.appendChild(div);
   }
 }
 function toggleSrvEnabled(i){if(!serverConfigs)return;const s=serverConfigs['s'+i]||{};s.enabled=!(s.enabled!==false);serverConfigs['s'+i]=s;const btn=document.getElementById('srv-tog-'+i);if(btn){btn.className='srv-toggle '+(s.enabled?'on':'off');btn.textContent=s.enabled?'🟢 ATIVO':'🔴 INATIVO';}updateSrvUI();}
 async function saveServers(){
   const data={};
-  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||'').trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||'').trim(),enabled:cur.enabled!==false};}
+  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||DEFAULT_IPTV_USER).trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||DEFAULT_IPTV_PASS).trim(),enabled:cur.enabled!==false};}
   serverConfigs=data;_cacheSrv();
   try{await db.collection('config').doc('servers').set(data);showAdmSrvMsg('✅ Servidores salvos!','ok');}catch(e){showAdmSrvMsg('✅ Salvo localmente!','ok');}
   clearAllCache();updateSrvUI();
