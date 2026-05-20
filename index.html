@@ -1029,7 +1029,7 @@ async function openCatSection(sec){
     }
   }
 
-  renderCats(cats);
+  renderCats(cats, sec);
   openCatPanelUI();
 
   // Show invite to pick category
@@ -1046,12 +1046,11 @@ function openCatPanelUI(){
 function closeCatPanel(){
   document.getElementById('cat-panel').classList.remove('open');
   document.getElementById('cat-overlay').style.display='none';
-  // Remove active from live/movies/series nav items
   ['live','movies','series'].forEach(s=>document.getElementById('nav-'+s)?.classList.remove('active'));
-  catSection='';
+  // NOTE: catSection is NOT zeroed here — renderCats passes sec directly now
 }
 
-function renderCats(cats){
+function renderCats(cats, sec){
   const list=document.getElementById('cat-list');list.innerHTML='';
   cats.forEach(c=>{
     const el=document.createElement('div');
@@ -1059,9 +1058,8 @@ function renderCats(cats){
     el.onclick=()=>{
       list.querySelectorAll('.cat-item').forEach(x=>x.classList.remove('active'));
       el.classList.add('active');
-      const _sec=catSection;  // capture BEFORE closeCatPanel() zeroes catSection
       closeCatPanel();
-      loadCatItems(_sec,c.category_id,c.category_name);
+      loadCatItems(sec, c.category_id, c.category_name);
     };
     list.appendChild(el);
   });
