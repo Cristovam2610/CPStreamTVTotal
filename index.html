@@ -17,18 +17,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Source+Sans+3:wght@300;400;600&display=swap');
 
 :root{
-  --scroll-w:10px;--scroll-thumb:#3a3a5c;--scroll-track:#12121e;
   --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26; --border:#2a2a3e;
   --accent:#2436d3; --accent2:#ff6b6b; --blue:#2436d3; --text:#f0f0f5;
   --muted:#6b6b8a; --gold:#ffd60a; --green:#2dc653; --r:12px;
   --sidebar:180px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-::-webkit-scrollbar{width:10px;height:10px;}
-::-webkit-scrollbar-track{background:#12121e;border-radius:6px;}
-::-webkit-scrollbar-thumb{background:#3a3a5c;border-radius:6px;}
-::-webkit-scrollbar-thumb:hover{background:#5a5a8c;}
-*{scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:16px;overflow:hidden;}
 
 /* ── BOOT ── */
@@ -217,7 +211,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
   border-radius:6px;line-height:1;transition:all .15s;
 }
 #cat-close:hover{background:rgba(255,255,255,.08);color:var(--text);}
-#cat-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
+#cat-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 .cat-item{
   padding:12px 16px;font-size:14px;cursor:pointer;
   border-left:3px solid transparent;
@@ -238,7 +232,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #search-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px;padding:9px 14px;width:240px;outline:none;font-family:'Source Sans 3',sans-serif;transition:border-color .2s;}
 #search-input:focus{border-color:var(--accent);}
 #item-count{font-size:13px;color:var(--muted);white-space:nowrap;}
-#content-body{flex:1;overflow-y:auto;padding:18px 22px;scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
+#content-body{flex:1;overflow-y:auto;padding:18px 22px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 
 /* ── GRIDS ── */
 .ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;}
@@ -377,20 +371,32 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #toast.err{border-color:var(--accent);color:var(--accent2);}
 #toast.ok{border-color:var(--green);color:var(--green);}
 
-/* ── AUDIO TRACK MENU ── */
-#audio-menu{position:absolute;bottom:170px;right:56px;
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
-  min-width:220px;display:none;box-shadow:0 10px 32px rgba(0,0,0,.8);z-index:20;}
-#audio-menu.show{display:block;}
-.audio-title{padding:10px 16px;font-size:11px;font-weight:700;
-  color:var(--muted);text-transform:uppercase;letter-spacing:1px;
-  border-bottom:1px solid var(--border);}
-.audio-row{padding:12px 16px;font-size:14px;cursor:pointer;display:flex;
-  align-items:center;gap:10px;transition:background .12s;color:var(--soft);}
-.audio-row:hover{background:rgba(255,255,255,.05);color:var(--text);}
-.audio-row.active{color:var(--blue);font-weight:700;}
-.audio-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
-.audio-row.active .audio-dot{background:var(--blue);}
+/* ── CONFIG PANEL ── */
+#cfg-panel{position:fixed;top:0;bottom:0;left:var(--sidebar);width:260px;background:var(--surface);border-right:2px solid var(--accent);z-index:500;transform:translateX(-110%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;box-shadow:6px 0 24px rgba(0,0,0,.6);}
+#cfg-panel.open{transform:translateX(0);}
+#cfg-panel-head{padding:14px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-shrink:0;}
+#cfg-panel-head h3{font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:1px;color:var(--accent);flex:1;margin:0;}
+#cfg-panel-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;}
+#cfg-body{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:14px;scrollbar-width:thin;}
+.cfg-section{display:flex;flex-direction:column;gap:7px;}
+.cfg-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;}
+.cfg-btns{display:flex;gap:5px;flex-wrap:wrap;}
+.cfg-btn{flex:1;min-width:52px;padding:7px 6px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;text-align:center;font-family:'Oswald',sans-serif;letter-spacing:.3px;transition:all .15s;white-space:nowrap;}
+.cfg-btn:hover{border-color:var(--accent);color:var(--text);}
+.cfg-btn.active{background:rgba(36,54,211,.22);border-color:var(--accent);color:#91b4ff;}
+.cfg-status{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;font-size:11px;line-height:1.9;color:var(--muted);}
+.cfg-status-row{display:flex;align-items:center;gap:6px;}
+.cfg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.cfg-dot.green{background:var(--green);}
+.cfg-dot.yellow{background:var(--gold);}
+.cfg-dot.red{background:var(--accent2);}
+.cfg-dot.gray{background:var(--muted);}
+#cfg-toggle{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:11px;cursor:pointer;transition:all .15s;font-family:'Source Sans 3',sans-serif;width:100%;}
+#cfg-toggle:hover{border-color:var(--accent);color:var(--text);}
+#cfg-toggle.gm-active{border-color:var(--green);color:var(--green);background:rgba(45,198,83,.08);}
+.cfg-install-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--r);padding:8px 14px;font-size:12px;cursor:pointer;font-family:'Oswald',sans-serif;letter-spacing:1px;width:100%;margin-top:4px;}
+.cfg-install-btn:hover{filter:brightness(1.1);}
+#cfg-overlay{display:none;position:fixed;inset:0;z-index:490;background:rgba(0,0,0,.3);}
 </style>
 </head>
 <body>
@@ -469,10 +475,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
             <div class="adm-field"><label>WhatsApp</label><input id="adm-wpp" type="text" placeholder="(51) 99999-9999"/></div>
           </div>
           <div class="adm-row">
-            <div class="adm-field"><label>Usuário IPTV</label><input id="adm-iptv-user" type="text" placeholder="usuario_iptv"/></div>
-            <div class="adm-field"><label>Senha IPTV</label><input id="adm-iptv-pass" type="text" placeholder="senha_iptv"/></div>
-          </div>
-          <div class="adm-row">
             <div class="adm-field"><label>Plano</label>
               <select id="adm-plan"><option value="30">30 dias</option><option value="90">90 dias</option><option value="365">1 ano</option><option value="0">Vitalício</option></select>
             </div>
@@ -548,6 +550,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       <button class="sb-srv-btn" id="srv-btn-4" onclick="switchServer(4)">S5</button>
     </div>
     <div class="sb-actions">
+      <button class="sb-act-btn" onclick="openCfgPanel()"><span>⚙</span> Configurações</button>
       <button class="sb-act-btn" id="btn-admin" onclick="openAdminPanel()" style="display:none"><span>🛡</span> Painel Admin</button>
       <button class="sb-act-btn danger" onclick="doAuthLogout()"><span>⏻</span> Sair do App</button>
     </div>
@@ -577,6 +580,85 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       <div id="vod-grid-wrap" style="display:none"><div class="vod-grid" id="vod-grid"></div></div>
     </div>
   </div>
+
+  <!-- CONFIG PANEL -->
+  <div id="cfg-panel">
+    <div id="cfg-panel-head">
+      <h3>⚙ CONFIGURAÇÕES</h3>
+      <button id="cfg-panel-close" onclick="closeCfgPanel()">✕</button>
+    </div>
+    <div id="cfg-body">
+
+      <div class="cfg-section">
+        <div class="cfg-label">Dispositivo</div>
+        <div class="cfg-btns" id="cfg-device-btns">
+          <button class="cfg-btn" data-val="auto"    onclick="setCfg('device','auto')">🤖 Auto</button>
+          <button class="cfg-btn" data-val="tizen"   onclick="setCfg('device','tizen')">📺 Tizen</button>
+          <button class="cfg-btn" data-val="android" onclick="setCfg('device','android')">📱 Android</button>
+          <button class="cfg-btn" data-val="pc"      onclick="setCfg('device','pc')">💻 PC</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">CORS / Acesso</div>
+        <div class="cfg-btns" id="cfg-cors-btns">
+          <button class="cfg-btn" data-val="auto"   onclick="setCfg('cors','auto')">🤖 Auto</button>
+          <button class="cfg-btn" data-val="proxy"  onclick="setCfg('cors','proxy')">🔒 Proxy</button>
+          <button class="cfg-btn" data-val="direct" onclick="setCfg('cors','direct')">⚡ Direto</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">Protocolo URL</div>
+        <div class="cfg-btns" id="cfg-proto-btns">
+          <button class="cfg-btn" data-val="auto"  onclick="setCfg('proto','auto')">🤖 Auto</button>
+          <button class="cfg-btn" data-val="https" onclick="setCfg('proto','https')">🔐 HTTPS</button>
+          <button class="cfg-btn" data-val="http"  onclick="setCfg('proto','http')">🌐 HTTP</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">Modo Player</div>
+        <div class="cfg-btns" id="cfg-player-btns">
+          <button class="cfg-btn" data-val="auto"   onclick="setCfg('player','auto')">🤖 Auto</button>
+          <button class="cfg-btn" data-val="hlsjs"  onclick="setCfg('player','hlsjs')">▶ HLS.js</button>
+          <button class="cfg-btn" data-val="native" onclick="setCfg('player','native')">📺 Nativo</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">Áudio Preferido</div>
+        <div class="cfg-btns" id="cfg-audio-btns">
+          <button class="cfg-btn" data-val="auto" onclick="setCfg('audio','auto')">🤖 Auto</button>
+          <button class="cfg-btn" data-val="por"  onclick="setCfg('audio','por')">🇧🇷 PT</button>
+          <button class="cfg-btn" data-val="eng"  onclick="setCfg('audio','eng')">🇺🇸 EN</button>
+          <button class="cfg-btn" data-val="spa"  onclick="setCfg('audio','spa')">🇪🇸 ES</button>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">Modo Script (PC / Android)</div>
+        <button id="cfg-toggle" onclick="openScriptInfo()">
+          <span id="cfg-gm-icon">📦</span>
+          <span id="cfg-gm-label">Script não detectado</span>
+        </button>
+        <button class="cfg-install-btn" onclick="downloadUserScript()">📥 Baixar Script (.user.js)</button>
+        <div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:4px;">Instale no <strong style="color:var(--text)">Tampermonkey</strong> (Chrome/Firefox PC e Android Firefox) para CORS bypass total sem proxy.</div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-label">Status Atual</div>
+        <div class="cfg-status" id="cfg-status-box">
+          <div class="cfg-status-row"><div class="cfg-dot gray" id="dot-device"></div><span id="lbl-device">Detectando...</span></div>
+          <div class="cfg-status-row"><div class="cfg-dot gray" id="dot-cors"></div><span id="lbl-cors">CORS: —</span></div>
+          <div class="cfg-status-row"><div class="cfg-dot gray" id="dot-script"></div><span id="lbl-script">Script: inativo</span></div>
+          <div class="cfg-status-row"><div class="cfg-dot gray" id="dot-audio"></div><span id="lbl-audio">Áudio: —</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div id="cfg-overlay" onclick="closeCfgPanel()"></div>
 </div>
 
 <!-- PLAYER -->
@@ -589,11 +671,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
     <span style="flex:1">⏱ Continuar de onde parou?</span>
     <button class="resume-btn" id="resume-yes-btn" onclick="doResume()">▶ Retomar</button>
     <button class="resume-btn sec" onclick="closeResume()">Do início</button>
-  </div>
-  <!-- Audio Track Menu -->
-  <div id="audio-menu">
-    <div class="audio-title">🎵 Faixa de Áudio</div>
-    <div id="audio-list"></div>
   </div>
   <div id="player-ui">
     <div id="pl-top">
@@ -610,9 +687,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       </div>
       <div id="pl-actions">
         <button class="pl-act" id="fav-act" onclick="toggleFavCurrent()">☆ Fav</button>
-        <button class="pl-act" id="audio-act" onclick="toggleAudioMenu()" style="display:none">🎵 Áudio</button>
         <button class="pl-act" id="mute-act" onclick="toggleMute()">🔊</button>
         <button class="pl-act" id="zoom-act" onclick="cycleZoom()">⛶ Zoom</button>
+        <button class="pl-act" id="audio-act" onclick="cycleAudio()" style="display:none">🎵 —</button>
         <button class="pl-act" onclick="navBack()">← Voltar</button>
       </div>
     </div>
@@ -633,7 +710,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
         <div class="pl-btn" id="btn-mute" onclick="toggleMute()">🔊</div>
         <div class="pl-btn" onclick="toggleFS()">⛶</div>
         <div id="pl-pos"></div>
-        <div id="pl-hint">M=Mute · F=Fav · Z=Zoom · ◄►=±30s · ▲▼=Canal</div>
+        <div id="pl-hint">M=Mute · F=Fav · A=Áudio · Z=Zoom · ◄►=±30s · ▲▼=Canal</div>
       </div>
     </div>
   </div>
@@ -732,6 +809,35 @@ const ADMIN_HASH=hashPwd('Porto@legre1965');
 function getDeviceId(){let d=tvGet('stv_device');if(!d){d='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);tvSet('stv_device',d);}return d;}
 const DEVICE_ID=getDeviceId();
 
+// ── Credenciais IPTV padrão (fixas no código — editáveis pelo Admin)
+const DEFAULT_IPTV_USER='venrkdml7n02';
+const DEFAULT_IPTV_PASS='71985344834';
+
+
+// ── Device detection
+(function detectDevice(){
+  const saved=tvGet('stv_cfg_device');
+  if(saved&&saved!=='auto'){DEVICE_TYPE=saved;return;}
+  if(window.tizen){DEVICE_TYPE='tizen';return;}
+  if(/Android/i.test(navigator.userAgent)){DEVICE_TYPE='android';return;}
+  DEVICE_TYPE='pc';
+})();
+
+// ── Tampermonkey GM bridge listener
+window.addEventListener('message',function(e){
+  if(!e.data||!e.data.type)return;
+  if(e.data.type==='CPStream_BRIDGE_READY'){
+    GM_BRIDGE=true;
+    const t=document.getElementById('cfg-toggle');
+    if(t){t.classList.add('gm-active');document.getElementById('cfg-gm-icon').textContent='🔌';document.getElementById('cfg-gm-label').textContent='Script ativo — CORS bypass ON';}
+    updateCfgStatus();
+    toast('🔌 Script detectado — CORS bypass ativo','ok');
+  }
+  if(e.data.type==='CPStream_GMRESPONSE'){
+    const p=pendingGM.get(e.data.id);
+    if(p){pendingGM.delete(e.data.id);if(e.data.error)p.rej(new Error(e.data.error));else p.res(e.data.data);}
+  }
+});
 // ── Global state
 let currentUser=null,isAdmin=false,sessionDocId=null,serverConfigs=null;
 let CFG={server:'',user:'',pass:'',isM3U:false};
@@ -742,6 +848,14 @@ let allItems=[],visItems=[],curCatId='all',curItemIdx=0;
 let hls=null,pUrls=[],pIdx=0,mErr=0,pItem=null,isVOD=false;
 let isPlaying=true,isMuted=false,overlayTimer=null,posTimer=null,epgTimer=null;
 let zoomIdx=0;
+let audioTracks=[],currentAudioIdx=0;
+
+// ── App Configuration (device + stream settings)
+const APP_CFG_KEYS=['device','cors','proto','player','audio'];
+let APP_CFG={device:'auto',cors:'auto',proto:'auto',player:'auto',audio:'auto'};
+let DEVICE_TYPE='pc'; // detected
+let GM_BRIDGE=false; // Tampermonkey bridge active
+const pendingGM=new Map();
 let favorites=[],watchHistory=[];
 let modalItem=null,modalType='';
 let seriesData=null,curSeason='';
@@ -759,7 +873,7 @@ const SMETA={
 // BOOT
 // ══════════════════════════════════════════════════════════════
 window.addEventListener('load',async()=>{
-  loadFavs(); loadHist(); loadZoom();
+  loadFavs(); loadHist(); loadZoom(); setTimeout(updateCfgStatus,1000);
   await animateBoot();
   const bootT=setTimeout(()=>{hideBootShowAuth();},5000);
   try{
@@ -814,13 +928,8 @@ async function doAuthLogin(){
     await loadServerConfigs();
     const sIdx=data.srvIdx||0;
     const srv=serverConfigs['s'+sIdx]||serverConfigs['s0'];
-    // Use user's own IPTV credentials; fallback to server defaults
-    const iptvUser=data.iptvUser||srv.iptv_user||'';
-    const iptvPass=data.iptvPass||srv.iptv_pass||'';
-    CFG={server:srv.url,user:iptvUser,pass:iptvPass,isM3U:false};
-    currentUser={docId:doc.id,username,name:data.name||username,srvIdx:sIdx,
-      plan:data.plan,expireAt:data.expireAt||null,isAdmin:data.isAdmin||false,
-      maxDevices:maxDev,iptvUser,iptvPass,ts:Date.now()};
+    CFG={server:srv.url,user:srv.iptv_user,pass:srv.iptv_pass,isM3U:false};
+    currentUser={docId:doc.id,username,name:data.name||username,srvIdx:sIdx,plan:data.plan,expireAt:data.expireAt||null,isAdmin:data.isAdmin||false,maxDevices:maxDev,ts:Date.now()};
     tvSet('stv_session',JSON.stringify(currentUser));
     if(data.isAdmin){isAdmin=true;document.getElementById('btn-admin').style.display='';}
     hideAuthPage();document.getElementById('boot').classList.add('hide');
@@ -849,9 +958,7 @@ async function checkSavedSession(){
     if(saved.isAdmin)isAdmin=true;
     await loadServerConfigs();
     const srv=serverConfigs['s'+(saved.srvIdx||0)]||serverConfigs['s0'];
-    const _iu=saved.iptvUser||srv.iptv_user||'';
-    const _ip=saved.iptvPass||srv.iptv_pass||'';
-    CFG={server:srv.url,user:_iu,pass:_ip,isM3U:false};
+    CFG={server:srv.url,user:srv.iptv_user,pass:srv.iptv_pass,isM3U:false};
     currentUser.ts=Date.now();tvSet('stv_session',JSON.stringify(currentUser));
     renewSession();
     document.getElementById('boot').classList.add('hide');
@@ -910,16 +1017,21 @@ async function loadServerConfigs(){
   if(serverConfigs)return;
   try{
     const doc=await Promise.race([db.collection('config').doc('servers').get(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),4000))]);
-    if(doc.exists){serverConfigs=doc.data();_cacheSrv();return;}
+    if(doc.exists){
+      serverConfigs=doc.data();
+      // Garante credenciais padrão em qualquer servidor sem credenciais no Firebase
+      for(let i=0;i<5;i++){const k='s'+i;if(!serverConfigs[k])serverConfigs[k]={};if(!serverConfigs[k].iptv_user)serverConfigs[k].iptv_user=DEFAULT_IPTV_USER;if(!serverConfigs[k].iptv_pass)serverConfigs[k].iptv_pass=DEFAULT_IPTV_PASS;}
+      _cacheSrv();return;
+    }
   }catch(_){}
   try{const ls=JSON.parse(tvGet('stv_srv_cfg')||'null');if(ls){serverConfigs=ls;return;}}catch(_){}
-  // Default 5 servers
+  // Default 5 servers com credenciais fixas como padrão
   serverConfigs={
-    s0:{url:'https://toppcard.fun',     iptv_user:'',iptv_pass:'',enabled:true},
-    s1:{url:'http://streams4k.xyz',     iptv_user:'',iptv_pass:'',enabled:true},
-    s2:{url:'https://pedidoonline.space',iptv_user:'',iptv_pass:'',enabled:true},
-    s3:{url:'https://adplayer.online',  iptv_user:'',iptv_pass:'',enabled:true},
-    s4:{url:'',                         iptv_user:'',iptv_pass:'',enabled:false},
+    s0:{url:'https://toppcard.fun',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s1:{url:'http://streams4k.xyz',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s2:{url:'https://pedidoonline.space', iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s3:{url:'https://adplayer.online',   iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s4:{url:'',                          iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:false},
   };
   _cacheSrv();
 }
@@ -933,10 +1045,8 @@ function switchServer(idx){
   if(!s||!s.url){toast('S'+(idx+1)+' sem URL — configure no Admin','err');return;}
   if(s.enabled===false){toast('S'+(idx+1)+' desativado','err');return;}
   if(!s.iptv_user||!s.iptv_pass){toast('S'+(idx+1)+' sem credenciais IPTV','err');return;}
-  const _u=currentUser?.iptvUser||s.iptv_user||'';
-  const _p=currentUser?.iptvPass||s.iptv_pass||'';
-  CFG={server:s.url,user:_u,pass:_p,isM3U:false};
-  if(currentUser){currentUser.srvIdx=idx;tvSet('stv_session',JSON.stringify(currentUser));}
+  CFG={server:s.url,user:s.iptv_user,pass:s.iptv_pass,isM3U:false};
+  currentUser.srvIdx=idx;tvSet('stv_session',JSON.stringify(currentUser));
   clearAllCache();updateSrvUI(idx);
   if(document.getElementById('app').classList.contains('show')) goFavsSection();
   toast('✅ S'+(idx+1)+' ativado','ok');
@@ -955,45 +1065,141 @@ function updateSrvUI(activeIdx){
 // ══════════════════════════════════════════════════════════════
 // ADMIN PANEL
 // ══════════════════════════════════════════════════════════════
-async function openAdminPanel(){await loadServerConfigs();document.querySelectorAll('.adm-tab').forEach((b,i)=>b.classList.toggle('active',i===0));['list','servers','sessions'].forEach(t=>document.getElementById('adm-tab-'+t).style.display='none');document.getElementById('adm-tab-new').style.display='';document.getElementById('admin-modal').classList.add('show');}
+async function openAdminPanel(){
+  await loadServerConfigs();
+  document.querySelectorAll('.adm-tab').forEach((b,i)=>b.classList.toggle('active',i===0));
+  ['list','servers','sessions'].forEach(t=>document.getElementById('adm-tab-'+t).style.display='none');
+  document.getElementById('adm-tab-new').style.display='';
+  // Remove qualquer aviso anterior de regras
+  const old=document.getElementById('firebase-rules-help');if(old)old.remove();
+  document.getElementById('admin-modal').classList.add('show');
+  // Testa permissão de escrita silenciosamente
+  testFirebaseWritePermission();
+}
+
+async function testFirebaseWritePermission(){
+  try{
+    // Tenta uma leitura simples para verificar se Firebase está acessível
+    await db.collection('users').limit(1).get();
+    // Se chegou aqui, leitura OK
+  }catch(e){
+    const msg=e.message||'';
+    if(msg.includes('permission')||msg.includes('PERMISSION_DENIED')){
+      showAdmMsg('⚠ Atenção: Regras do Firestore bloqueando acesso. Clique em "Criar Acesso" para ver como corrigir.','err');
+    }
+  }
+}
 function closeAdmin(){document.getElementById('admin-modal').classList.remove('show');}
 function admTab(tab,btn){document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['new','list','servers','sessions'].forEach(t=>document.getElementById('adm-tab-'+t).style.display=t===tab?'':'none');if(tab==='list')loadUserList();if(tab==='servers')renderSrvEditor();if(tab==='sessions')loadSessions();}
 
 async function createUser(){
-  const username=(document.getElementById('adm-user').value||'').trim().toLowerCase();
-  const password=(document.getElementById('adm-pass').value||'').trim();
-  const name=(document.getElementById('adm-name').value||'').trim();
-  const wpp=(document.getElementById('adm-wpp').value||'').trim();
-  const iptvUser=(document.getElementById('adm-iptv-user')?.value||'').trim();
-  const iptvPass=(document.getElementById('adm-iptv-pass')?.value||'').trim();
+  const username=document.getElementById('adm-user').value.trim().toLowerCase();
+  const password=document.getElementById('adm-pass').value.trim();
+  const name=document.getElementById('adm-name').value.trim();
+  const wpp=document.getElementById('adm-wpp').value.trim();
   const plan=parseInt(document.getElementById('adm-plan').value);
   const srvIdx=parseInt(document.getElementById('adm-server').value);
   const maxDev=parseInt(document.getElementById('adm-devices').value);
-  if(!username||!password||!name){showAdmMsg('Preencha usuário, senha e nome.','err');return;}
-  if(password.length<8){showAdmMsg('Senha mínimo 8 caracteres.','err');return;}
+
+  // Validações locais
+  if(!username){showAdmMsg('⚠ Preencha o campo Usuário.','err');return;}
+  if(!password){showAdmMsg('⚠ Preencha o campo Senha.','err');return;}
+  if(!name){showAdmMsg('⚠ Preencha o Nome completo.','err');return;}
+  if(password.length<8){showAdmMsg('⚠ Senha precisa ter pelo menos 8 caracteres.','err');return;}
+  if(!/^[a-z0-9_]+$/.test(username)){showAdmMsg('⚠ Usuário: use apenas letras, números e _.','err');return;}
+
+  showAdmMsg('⏳ Criando acesso...','ok');
+
   try{
+    // Verificar duplicata
     const ex=await db.collection('users').where('username','==',username).limit(1).get();
-    if(!ex.empty){showAdmMsg('Usuário já existe!','err');return;}
-    const expireAt=plan===0?null:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+plan*24*60*60*1000));
+    if(!ex.empty){showAdmMsg('❌ Usuário "'+username+'" já existe!','err');return;}
+
+    // Calcular vencimento
+    const expireAt=plan===0?null:firebase.firestore.Timestamp.fromDate(
+      new Date(Date.now()+plan*24*60*60*1000)
+    );
+
+    // Criar usuário
     await db.collection('users').add({
-      username,passHash:hashPwd(password),name,plan,srvIdx,
-      maxDevices:maxDev,wpp:wpp||'',
-      iptvUser:iptvUser||'',  // user's own IPTV credentials
-      iptvPass:iptvPass||'',
-      active:true,isAdmin:false,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp(),expireAt
+      username,
+      passHash:hashPwd(password),
+      name,
+      plan,
+      srvIdx,
+      maxDevices:maxDev,
+      wpp:wpp||'',
+      active:true,
+      isAdmin:false,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      expireAt
     });
-    showAdmMsg('✅ "'+username+'" criado!','ok');
-    ['adm-user','adm-pass','adm-name','adm-wpp','adm-iptv-user','adm-iptv-pass'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.value='';
-    });
-  }catch(e){showAdmMsg('❌ Erro: '+e.message,'err');}
+
+    showAdmMsg('✅ Usuário "'+username+'" criado com sucesso!','ok');
+    ['adm-user','adm-pass','adm-name','adm-wpp'].forEach(id=>document.getElementById(id).value='');
+    toast('✅ Usuário "'+username+'" criado!','ok');
+
+  }catch(e){
+    const msg=e.message||'';
+    if(msg.includes('permission')||msg.includes('PERMISSION_DENIED')){
+      showAdmMsg('❌ PERMISSÃO NEGADA — Atualize as Regras do Firestore no Firebase Console. Veja o botão abaixo.','err');
+      showFirebaseRulesHelp();
+    } else if(msg.includes('network')||msg.includes('unavailable')){
+      showAdmMsg('❌ Sem conexão com Firebase. Verifique sua internet.','err');
+    } else {
+      showAdmMsg('❌ Erro: '+msg,'err');
+    }
+    console.error('[CPStreamTV] createUser error:',e);
+  }
+}
+
+function showFirebaseRulesHelp(){
+  const existing=document.getElementById('firebase-rules-help');
+  if(existing)return;
+  const box=document.createElement('div');
+  box.id='firebase-rules-help';
+  box.style.cssText='background:rgba(36,54,211,.1);border:1px solid rgba(36,54,211,.4);border-radius:12px;padding:14px 16px;margin-top:10px;font-size:12px;line-height:1.8;color:var(--muted);';
+  box.innerHTML=`
+    <div style="font-weight:700;color:var(--text);margin-bottom:6px;">🛠 Como corrigir — Firebase Console</div>
+    <div>1. Acesse: <a href="https://console.firebase.google.com" target="_blank" style="color:var(--blue)">console.firebase.google.com</a></div>
+    <div>2. Projeto <strong style="color:var(--text)">cpstreamtv-3d6ee</strong> → Firestore Database</div>
+    <div>3. Aba <strong style="color:var(--text)">Regras</strong> → Cole as regras abaixo → Publicar</div>
+    <pre style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px;margin-top:8px;font-size:11px;overflow-x:auto;color:var(--green);">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</pre>
+    <button onclick="copyFirebaseRules()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;margin-top:6px;">📋 Copiar Regras</button>
+    <button onclick="document.getElementById('firebase-rules-help').remove()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:12px;cursor:pointer;margin-top:6px;margin-left:6px;color:var(--muted);">✕ Fechar</button>
+  `;
+  document.getElementById('adm-msg').after(box);
+}
+
+function copyFirebaseRules(){
+  const rules=`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}`;
+  navigator.clipboard.writeText(rules).then(()=>toast('✅ Regras copiadas!','ok')).catch(()=>{
+    const ta=document.createElement('textarea');ta.value=rules;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('✅ Regras copiadas!','ok');
+  });
 }
 function showAdmMsg(msg,type){const el=document.getElementById('adm-msg');el.textContent=msg;el.className='adm-msg '+type;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
 
 async function loadUserList(){
   const list=document.getElementById('adm-usr-list');list.innerHTML='<div style="text-align:center;padding:36px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:10px"><div class="spinner-sm"></div></div>';
-  try{const snap=await db.collection('users').orderBy('createdAt','desc').get();if(snap.empty){list.innerHTML='<div style="text-align:center;padding:36px;color:var(--muted)">Nenhum usuário.</div>';return;}list.innerHTML='';snap.forEach(doc=>{const d=doc.data();const exp=d.expireAt?.toMillis?d.expireAt.toMillis():null;const expired=d.plan!==0&&exp&&Date.now()>exp;const expStr=d.plan===0?'Vitalício':(exp?new Date(exp).toLocaleDateString('pt-BR'):'—');const row=document.createElement('div');row.className='usr-row';row.innerHTML=`<div style="flex:1;min-width:0"><div class="usr-name">${esc(d.name||'')} <span style="font-size:11px;color:var(--muted)">@${esc(d.username||'')}</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px">S${(d.srvIdx||0)+1}·${d.maxDevices||1}disp.·${d.wpp||'—'}</div></div><span class="usr-badge ${expired?'expired':d.active?'active':''}">${expired?'Expirado':d.active?'Ativo':'Inativo'}</span><div class="usr-exp">${expStr}</div><button class="usr-btn" onclick="toggleActive('${doc.id}',${d.active})">${d.active?'Desativar':'Ativar'}</button><button class="usr-btn" onclick="editExpire('${doc.id}','${esc(d.username||'')}')">📅</button><button class="usr-btn" onclick="deleteUser('${doc.id}','${esc(d.username||'')}')">🗑</button>`;list.appendChild(row);});}catch(e){list.innerHTML='<div style="text-align:center;padding:36px;color:var(--accent2)">❌ Erro.</div>';}
+  try{const snap=await db.collection('users').orderBy('createdAt','desc').get();if(snap.empty){list.innerHTML='<div style="text-align:center;padding:36px;color:var(--muted)">Nenhum usuário.</div>';return;}list.innerHTML='';snap.forEach(doc=>{const d=doc.data();const exp=d.expireAt?.toMillis?d.expireAt.toMillis():null;const expired=d.plan!==0&&exp&&Date.now()>exp;const expStr=d.plan===0?'Vitalício':(exp?new Date(exp).toLocaleDateString('pt-BR'):'—');const row=document.createElement('div');row.className='usr-row';row.innerHTML=`<div style="flex:1;min-width:0"><div class="usr-name">${esc(d.name||'')} <span style="font-size:11px;color:var(--muted)">@${esc(d.username||'')}</span></div><div style="font-size:11px;color:var(--muted);margin-top:2px">S${(d.srvIdx||0)+1}·${d.maxDevices||1}disp.·${d.wpp||'—'}</div></div><span class="usr-badge ${expired?'expired':d.active?'active':''}">${expired?'Expirado':d.active?'Ativo':'Inativo'}</span><div class="usr-exp">${expStr}</div><button class="usr-btn" onclick="toggleActive('${doc.id}',${d.active})">${d.active?'Desativar':'Ativar'}</button><button class="usr-btn" onclick="editExpire('${doc.id}','${esc(d.username||'')}')">📅</button><button class="usr-btn" onclick="deleteUser('${doc.id}','${esc(d.username||'')}')">🗑</button>`;list.appendChild(row);});}catch(e){
+  const msg=e.message||'';
+  const isPerms=msg.includes('permission')||msg.includes('PERMISSION_DENIED');
+  list.innerHTML='<div style="text-align:center;padding:24px;color:var(--accent2);line-height:1.8;">❌ '+(isPerms?'Permissão negada no Firestore.<br><small style="font-size:11px;color:var(--muted)">Atualize as Regras no Firebase Console.<br>Clique em ➕ Novo Usuário e siga as instruções.</small>':'Erro: '+esc(msg))+'</div>';
+}
 }
 async function toggleActive(id,cur){try{await db.collection('users').doc(id).update({active:!cur});loadUserList();toast(!cur?'Ativado':'Desativado');}catch(e){toast('Erro: '+e.message,'err');}}
 async function deleteUser(id,uname){if(!confirm('Excluir "'+uname+'"?'))return;try{await db.collection('users').doc(id).delete();loadUserList();toast('Excluído');}catch(e){toast('Erro: '+e.message,'err');}}
@@ -1009,17 +1215,17 @@ function renderSrvEditor(){
   const ed=document.getElementById('srv-editor');ed.innerHTML='';
   const labels=['S1','S2','S3','S4','S5'];
   for(let i=0;i<5;i++){
-    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:'',iptv_pass:'',enabled:true};
+    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true};
     const on=s.enabled!==false;
     const div=document.createElement('div');div.className='srv-block';
-    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||'')}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||'')}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
+    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||DEFAULT_IPTV_USER)}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||DEFAULT_IPTV_PASS)}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
     ed.appendChild(div);
   }
 }
 function toggleSrvEnabled(i){if(!serverConfigs)return;const s=serverConfigs['s'+i]||{};s.enabled=!(s.enabled!==false);serverConfigs['s'+i]=s;const btn=document.getElementById('srv-tog-'+i);if(btn){btn.className='srv-toggle '+(s.enabled?'on':'off');btn.textContent=s.enabled?'🟢 ATIVO':'🔴 INATIVO';}updateSrvUI();}
 async function saveServers(){
   const data={};
-  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||'').trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||'').trim(),enabled:cur.enabled!==false};}
+  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||DEFAULT_IPTV_USER).trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||DEFAULT_IPTV_PASS).trim(),enabled:cur.enabled!==false};}
   serverConfigs=data;_cacheSrv();
   try{await db.collection('config').doc('servers').set(data);showAdmSrvMsg('✅ Servidores salvos!','ok');}catch(e){showAdmSrvMsg('✅ Salvo localmente!','ok');}
   clearAllCache();updateSrvUI();
@@ -1037,9 +1243,22 @@ async function testServer(i){
 // ══════════════════════════════════════════════════════════════
 // API
 // ══════════════════════════════════════════════════════════════
+function gmFetch(url){
+  return new Promise((res,rej)=>{
+    const id=Math.random().toString(36).slice(2);
+    pendingGM.set(id,{res,rej});
+    setTimeout(()=>{if(pendingGM.has(id)){pendingGM.delete(id);rej(new Error('GM timeout'));}},15000);
+    window.postMessage({type:'CPStream_GMFETCH',id,url},'*');
+  });
+}
 async function apiGet(action,extra=''){
   const url=`${CFG.server}/player_api.php?username=${CFG.user}&password=${CFG.pass}&action=${action}${extra}`;
-  const tries=[url,`https://corsproxy.io/?${encodeURIComponent(url)}`,`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`];
+  if(GM_BRIDGE){try{const t=await gmFetch(url);return JSON.parse(t);}catch(e){}}
+  const corsCfg=tvGet('stv_cfg_cors')||'auto';
+  const useProxy=corsCfg==='proxy'||(corsCfg==='auto'&&url.startsWith('http://')&&location.protocol==='https:');
+  const tries=useProxy
+    ?[`https://corsproxy.io/?${encodeURIComponent(url)}`,`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,url]
+    :[url,`https://corsproxy.io/?${encodeURIComponent(url)}`,`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`];
   for(const u of tries){
     try{const c=new AbortController();const t=setTimeout(()=>c.abort(),10000);const r=await fetch(u,{signal:c.signal,headers:{'User-Agent':UA}});clearTimeout(t);if(!r.ok)continue;const d=await r.json();if(d)return d;}catch(e){}
   }
@@ -1433,9 +1652,41 @@ function closeEpModal(){document.getElementById('ep-modal').classList.remove('sh
 // ══════════════════════════════════════════════════════════════
 // PLAYER — URL BUILDERS
 // ══════════════════════════════════════════════════════════════
-function buildLiveUrls(id){const{server:s,user:u,pass:p}=CFG;const b=s.replace(/\/+$/,'');const h=b.replace(/^http:\/\//,'https://');return[`${b}/live/${u}/${p}/${id}.m3u8`,`${b}/live/${u}/${p}/${id}.ts`,`${b}:80/live/${u}/${p}/${id}.m3u8`,`${b}:80/live/${u}/${p}/${id}.ts`,`${h}/live/${u}/${p}/${id}.m3u8`,`${h}/live/${u}/${p}/${id}.ts`];}
-function buildMovieUrls(id,ext){const{server:s,user:u,pass:p}=CFG;const b=s.replace(/\/+$/,'');const h=b.replace(/^http:\/\//,'https://');const exts=ext?[ext,'mp4','mkv','avi']:['mp4','mkv','avi'];const out=[];exts.forEach(e=>{out.push(`${b}/movie/${u}/${p}/${id}.${e}`);out.push(`${h}/movie/${u}/${p}/${id}.${e}`);});return out;}
-function buildEpUrls(id,ext){const{server:s,user:u,pass:p}=CFG;const b=s.replace(/\/+$/,'');const h=b.replace(/^http:\/\//,'https://');const exts=ext?[ext,'mkv','mp4','avi']:['mkv','mp4','avi'];const out=[];exts.forEach(e=>{out.push(`${b}/series/${u}/${p}/${id}.${e}`);out.push(`${h}/series/${u}/${p}/${id}.${e}`);});return out;}
+function buildLiveUrls(id){
+  const{server:s,user:u,pass:p}=CFG;
+  const b=s.replace(/\/+$/,'');
+  const h=b.replace(/^http:\/\//,'https://');
+  const base=`/live/${u}/${p}/${id}`;
+  const proto=tvGet('stv_cfg_proto')||'auto';
+  const dev=DEVICE_TYPE;
+  if(proto==='https'||(proto==='auto'&&dev!=='tizen'))
+    return[`${h}${base}.m3u8`,`${h}${base}.ts`,`${b}${base}.m3u8`,`${b}${base}.ts`,`${b}:80${base}.m3u8`,`${b}:80${base}.ts`];
+  return[`${b}${base}.m3u8`,`${b}${base}.ts`,`${b}:80${base}.m3u8`,`${b}:80${base}.ts`,`${h}${base}.m3u8`,`${h}${base}.ts`];
+}
+function buildMovieUrls(id,ext){
+  const{server:s,user:u,pass:p}=CFG;
+  const b=s.replace(/\/+$/,'');const h=b.replace(/^http:\/\//,'https://');
+  const exts=ext?[ext,'mp4','mkv','avi']:['mp4','mkv','avi'];
+  const out=[];const proto=tvGet('stv_cfg_proto')||'auto';
+  const httpsFirst=proto==='https'||(proto==='auto'&&DEVICE_TYPE!=='tizen');
+  exts.forEach(e=>{
+    if(httpsFirst){out.push(`${h}/movie/${u}/${p}/${id}.${e}`);out.push(`${b}/movie/${u}/${p}/${id}.${e}`);}
+    else{out.push(`${b}/movie/${u}/${p}/${id}.${e}`);out.push(`${h}/movie/${u}/${p}/${id}.${e}`);}
+  });
+  return out;
+}
+function buildEpUrls(id,ext){
+  const{server:s,user:u,pass:p}=CFG;
+  const b=s.replace(/\/+$/,'');const h=b.replace(/^http:\/\//,'https://');
+  const exts=ext?[ext,'mkv','mp4','avi']:['mkv','mp4','avi'];
+  const out=[];const proto=tvGet('stv_cfg_proto')||'auto';
+  const httpsFirst=proto==='https'||(proto==='auto'&&DEVICE_TYPE!=='tizen');
+  exts.forEach(e=>{
+    if(httpsFirst){out.push(`${h}/series/${u}/${p}/${id}.${e}`);out.push(`${b}/series/${u}/${p}/${id}.${e}`);}
+    else{out.push(`${b}/series/${u}/${p}/${id}.${e}`);out.push(`${h}/series/${u}/${p}/${id}.${e}`);}
+  });
+  return out;
+}
 
 // ══════════════════════════════════════════════════════════════
 // PLAYER — PLAY
@@ -1478,11 +1729,23 @@ function loadUrl(idx){
   if(idx>=pUrls.length){showPlSpin(false);showPlErr(true,'⚠ Stream indisponível.');return;}
   pIdx=idx;const url=pUrls[idx];const v=document.getElementById('player-video');
   if(hls){hls.destroy();hls=null;}v.src='';
-  if(url.includes('.m3u8')&&Hls.isSupported()){
-    hls=new Hls({enableWorker:false,lowLatencyMode:true,backBufferLength:0,maxBufferLength:30,startLevel:-1,xhrSetup:xhr=>{try{xhr.setRequestHeader('User-Agent',UA);}catch(e){}}});
+  const playerMode=tvGet('stv_cfg_player')||'auto';
+  const corsCfg=tvGet('stv_cfg_cors')||'auto';
+  const needsProxy=corsCfg==='proxy'||(corsCfg==='auto'&&url.startsWith('http://')&&location.protocol==='https:'&&DEVICE_TYPE!=='tizen');
+  const useNative=playerMode==='native'||(playerMode==='auto'&&!Hls.isSupported());
+  if(!useNative&&url.includes('.m3u8')&&Hls.isSupported()){
+    hls=new Hls({enableWorker:false,lowLatencyMode:true,backBufferLength:0,maxBufferLength:30,startLevel:-1,
+      xhrSetup:(xhr,xhrUrl)=>{
+        try{
+          if(needsProxy&&xhrUrl&&xhrUrl.startsWith('http://')){xhr.open('GET','https://corsproxy.io/?'+encodeURIComponent(xhrUrl),true);}
+          xhr.setRequestHeader('User-Agent',UA);
+        }catch(e){}
+      }
+    });
     hls.loadSource(url);hls.attachMedia(v);
-    hls.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});showPlSpin(false);mErr=0;isPlaying=true;document.getElementById('btn-pp').textContent='⏸';setTimeout(buildAudioMenu,600);});
-    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED,()=>buildAudioMenu());
+    hls.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});showPlSpin(false);mErr=0;isPlaying=true;document.getElementById('btn-pp').textContent='⏸';applyPreferredAudio();});
+    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED,(_,d)=>{audioTracks=d.audioTracks||[];currentAudioIdx=hls.audioTrack>=0?hls.audioTrack:0;updateAudioBtn();applyPreferredAudio();});
+    hls.on(Hls.Events.AUDIO_TRACK_SWITCHED,(_,d)=>{currentAudioIdx=d.id;updateAudioBtn();});
     hls.on(Hls.Events.ERROR,(_,d)=>{if(!d.fatal)return;if(d.type===Hls.ErrorTypes.MEDIA_ERROR&&mErr<2){mErr++;hls.recoverMediaError();}else{hls.destroy();hls=null;loadUrl(pIdx+1);}});
     hls.on(Hls.Events.FRAG_BUFFERED,()=>showPlSpin(false));
   }else{v.src=url;v.load();v.play().catch(()=>loadUrl(pIdx+1));}
@@ -1501,6 +1764,7 @@ function stopAndClosePlayer(){
   clearTimeout(overlayTimer);clearTimeout(posTimer);clearTimeout(epgTimer);
   document.getElementById('player-page').classList.remove('show');
   document.getElementById('pl-epg').style.display='none';
+  audioTracks=[];currentAudioIdx=0;updateAudioBtn();
 }
 
 function setPlHeader(title,isLive,thumb){
@@ -1592,6 +1856,7 @@ function navBack(){
   if(document.getElementById('vod-modal').classList.contains('show')){closeVodModal();return;}
   if(document.getElementById('hist-popup-overlay').classList.contains('show')){closeHistPopup();return;}
   if(document.getElementById('admin-modal').classList.contains('show')){closeAdmin();return;}
+  if(document.getElementById('cfg-panel').classList.contains('open')){closeCfgPanel();return;}
   if(document.getElementById('cat-panel').classList.contains('open')){closeCatPanel();return;}
   if(document.getElementById('player-page').classList.contains('show')){stopAndClosePlayer();return;}
   if(navStack.length>0){navStack.pop();}
@@ -1600,40 +1865,6 @@ function navBack(){
 // ══════════════════════════════════════════════════════════════
 // KEYBOARD
 // ══════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════
-// AUDIO TRACKS
-// ═══════════════════════════════════════════════
-function buildAudioMenu(){
-  if(!hlsP && !hls){return;}
-  var h=hlsP||hls;
-  var tracks=h.audioTracks, cur=h.audioTrack;
-  var list=document.getElementById('audio-list');
-  var btn=document.getElementById('audio-act');
-  if(!list)return;
-  list.innerHTML='';
-  if(!tracks||!tracks.length){if(btn)btn.style.display='none';return;}
-  if(btn)btn.style.display='';
-  tracks.forEach(function(t,i){
-    var row=document.createElement('div');
-    row.className='audio-row'+(i===cur?' active':'');
-    var lang=t.name||t.lang||('Faixa '+(i+1));
-    row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
-    row.onclick=(function(idx,name){return function(){
-      var h2=hlsP||hls;if(h2)h2.audioTrack=idx;
-      buildAudioMenu();toast('🎵 '+name);hideAudioMenu();
-    };})(i,lang);
-    list.appendChild(row);
-  });
-}
-function toggleAudioMenu(){
-  var m=document.getElementById('audio-menu');
-  if(m){m.classList.toggle('show');showOverlay();}
-}
-function hideAudioMenu(){
-  var m=document.getElementById('audio-menu');if(m)m.classList.remove('show');
-}
-
 document.addEventListener('keydown',e=>{
   const k=e.keyCode||e.which;
   if(k===27||k===8||k===10009){e.preventDefault();navBack();return;}
@@ -1653,6 +1884,7 @@ document.addEventListener('keydown',e=>{
   else if(k===70)toggleFavCurrent();
   else if(k===90)cycleZoom();
   else if(k===77)toggleMute();
+  else if(k===65)cycleAudio();
 });
 
 // ══════════════════════════════════════════════════════════════
@@ -1674,6 +1906,140 @@ function registerTizenKeys(){
 // ══════════════════════════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════════════════════════
+
+// ══════════════════════════════════════════════════════════════
+// AUDIO TRACKS
+// ══════════════════════════════════════════════════════════════
+function cycleAudio(){
+  if(!hls||!audioTracks.length){toast('Sem faixas de áudio disponíveis');return;}
+  currentAudioIdx=(currentAudioIdx+1)%audioTracks.length;
+  hls.audioTrack=currentAudioIdx;
+  const t=audioTracks[currentAudioIdx];
+  toast('🎵 Áudio: '+(t.lang||t.name||'Faixa '+(currentAudioIdx+1)).toUpperCase(),'ok');
+  updateAudioBtn();showOverlay();
+}
+function updateAudioBtn(){
+  const btn=document.getElementById('audio-act');if(!btn)return;
+  if(!audioTracks.length){btn.style.display='none';return;}
+  btn.style.display='';
+  const t=audioTracks[currentAudioIdx]||audioTracks[0];
+  btn.textContent='🎵 '+(t.lang||t.name||'TK'+(currentAudioIdx+1)).slice(0,3).toUpperCase();
+  const lbl=document.getElementById('lbl-audio');if(lbl)lbl.textContent='Áudio: '+audioTracks.length+' faixa(s)';
+  const dot=document.getElementById('dot-audio');if(dot)dot.className='cfg-dot '+(audioTracks.length>1?'green':'gray');
+}
+function applyPreferredAudio(){
+  if(!hls||!audioTracks.length)return;
+  const pref=tvGet('stv_cfg_audio')||'auto';
+  if(pref==='auto')return;
+  const idx=audioTracks.findIndex(t=>(t.lang||'').toLowerCase().includes(pref)||(t.name||'').toLowerCase().includes(pref));
+  if(idx>=0){hls.audioTrack=idx;currentAudioIdx=idx;updateAudioBtn();}
+}
+
+// ══════════════════════════════════════════════════════════════
+// CONFIG PANEL
+// ══════════════════════════════════════════════════════════════
+function openCfgPanel(){
+  loadCfgToUI();updateCfgStatus();
+  document.getElementById('cfg-panel').classList.add('open');
+  document.getElementById('cfg-overlay').style.display='block';
+}
+function closeCfgPanel(){
+  document.getElementById('cfg-panel').classList.remove('open');
+  document.getElementById('cfg-overlay').style.display='none';
+}
+function setCfg(key,val){
+  tvSet('stv_cfg_'+key,val);
+  if(key==='device'){
+    const saved=val==='auto'?null:val;
+    if(val==='auto'){if(window.tizen)DEVICE_TYPE='tizen';else if(/Android/i.test(navigator.userAgent))DEVICE_TYPE='android';else DEVICE_TYPE='pc';}
+    else DEVICE_TYPE=val;
+  }
+  loadCfgToUI();updateCfgStatus();
+  clearAllCache();
+  toast('✅ '+(key.charAt(0).toUpperCase()+key.slice(1))+': '+val,'ok');
+}
+function loadCfgToUI(){
+  const keys=['device','cors','proto','player','audio'];
+  const ids={device:'cfg-device-btns',cors:'cfg-cors-btns',proto:'cfg-proto-btns',player:'cfg-player-btns',audio:'cfg-audio-btns'};
+  keys.forEach(k=>{
+    const saved=tvGet('stv_cfg_'+k)||'auto';
+    const container=document.getElementById(ids[k]);if(!container)return;
+    container.querySelectorAll('.cfg-btn').forEach(btn=>{btn.classList.toggle('active',btn.dataset.val===saved);});
+  });
+}
+function updateCfgStatus(){
+  const dev=DEVICE_TYPE;
+  const devEl=document.getElementById('lbl-device');const devDot=document.getElementById('dot-device');
+  if(devEl){devEl.textContent='Dispositivo: '+({tizen:'📺 Tizen TV',android:'📱 Android',pc:'💻 PC/Windows'}[dev]||dev);}
+  if(devDot){devDot.className='cfg-dot '+(dev==='tizen'?'green':dev==='android'?'yellow':'blue'||'green');}
+
+  const corsMode=tvGet('stv_cfg_cors')||'auto';
+  const isHttps=location.protocol==='https:';
+  const corsEl=document.getElementById('lbl-cors');const corsDot=document.getElementById('dot-cors');
+  let corsStatus='';
+  if(GM_BRIDGE){corsStatus='CORS: Bypass via Script 🔌';}
+  else if(corsMode==='proxy'){corsStatus='CORS: Forçar Proxy';}
+  else if(corsMode==='direct'){corsStatus='CORS: Direto (sem proxy)';}
+  else{corsStatus=isHttps&&dev!=='tizen'?'CORS: Auto-proxy':'CORS: Direto (Tizen/HTTP)';}
+  if(corsEl)corsEl.textContent=corsStatus;
+  if(corsDot)corsDot.className='cfg-dot '+(GM_BRIDGE?'green':corsMode==='proxy'?'yellow':'gray');
+
+  const scrEl=document.getElementById('lbl-script');const scrDot=document.getElementById('dot-script');
+  if(scrEl)scrEl.textContent='Script: '+(GM_BRIDGE?'Ativo — bypass total':'Inativo');
+  if(scrDot)scrDot.className='cfg-dot '+(GM_BRIDGE?'green':'gray');
+}
+function openScriptInfo(){
+  toast('Instale o Tampermonkey e use "Baixar Script" abaixo');
+}
+function downloadUserScript(){
+  const scr=generateUserScript();
+  const b=new Blob([scr],{type:'application/javascript'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='CPStreamTVTotal.user.js';a.click();
+  toast('📥 Script baixado! Abra no Tampermonkey','ok');
+}
+function generateUserScript(){
+  return `// ==UserScript==
+// @name         CPStreamTVTotal — CORS Bridge
+// @namespace    https://cristovam2610.github.io/CPStreamTVTotal
+// @version      2.0
+// @description  IPTV Player - Bypass CORS total para PC e Android (Firefox+Tampermonkey)
+// @author       Prof. Cristovam Pereira — youtube.com/@CriadorC
+// @match        https://cristovam2610.github.io/CPStreamTVTotal/*
+// @match        http://localhost:*/*
+// @match        http://127.0.0.1:*/*
+// @grant        GM_xmlhttpRequest
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @connect      *
+// @run-at       document-end
+// ==/UserScript==
+
+(function(){'use strict';
+  // Status indicator
+  const ind=document.createElement('div');
+  ind.style.cssText='position:fixed;bottom:70px;right:12px;z-index:99999;background:#2dc653;color:#fff;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:1px;opacity:.9;pointer-events:none;font-family:monospace;box-shadow:0 2px 8px rgba(0,0,0,.4);';
+  ind.textContent='🔌 CORS BYPASS ATIVO';
+  document.body.appendChild(ind);
+
+  // GM Bridge — responde a requisições do app
+  window.addEventListener('message',function(e){
+    if(!e.data||e.data.type!=='CPStream_GMFETCH')return;
+    const{id,url}=e.data;
+    GM_xmlhttpRequest({
+      method:'GET',url,responseType:'text',timeout:15000,
+      headers:{'User-Agent':'Mozilla/5.0 (SMART-TV; Linux; Tizen 6.0) AppleWebKit/538.1'},
+      onload:function(r){window.postMessage({type:'CPStream_GMRESPONSE',id,status:r.status,data:r.responseText},'*');},
+      onerror:function(){window.postMessage({type:'CPStream_GMRESPONSE',id,status:0,error:'Erro de rede'},'*');},
+      ontimeout:function(){window.postMessage({type:'CPStream_GMRESPONSE',id,status:0,error:'Timeout'},'*');}
+    });
+  });
+
+  // Sinaliza que o bridge está pronto
+  setTimeout(function(){window.postMessage({type:'CPStream_BRIDGE_READY'},'*');},800);
+  console.log('[CPStreamTV] Script GM Bridge ativo — CORS bypass habilitado');
+})();`;
+}
+
 function showScModal(){document.getElementById('sc-modal').classList.add('show');}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let _toastT;
