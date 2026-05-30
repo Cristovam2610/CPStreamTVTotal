@@ -378,9 +378,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #toast.ok{border-color:var(--green);color:var(--green);}
 
 /* ── AUDIO TRACK MENU ── */
-#audio-menu{position:absolute;bottom:170px;right:56px;
+#audio-menu{position:absolute;bottom:160px;right:40px;
   background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
-  min-width:220px;display:none;box-shadow:0 10px 32px rgba(0,0,0,.8);z-index:20;}
+  min-width:240px;max-height:320px;overflow-y:auto;
+  display:none;box-shadow:0 10px 40px rgba(0,0,0,.9);z-index:50;}
 #audio-menu.show{display:block;}
 .audio-title{padding:10px 16px;font-size:11px;font-weight:700;
   color:var(--muted);text-transform:uppercase;letter-spacing:1px;
@@ -610,7 +611,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       </div>
       <div id="pl-actions">
         <button class="pl-act" id="fav-act" onclick="toggleFavCurrent()">☆ Fav</button>
-        <button class="pl-act" id="audio-act" onclick="toggleAudioMenu()" style="display:none">🎵 Áudio</button>
+        <button class="pl-act" id="audio-act" onclick="toggleAudioMenu()">🎵 Áudio</button>
         <button class="pl-act" id="mute-act" onclick="toggleMute()">🔊</button>
         <button class="pl-act" id="zoom-act" onclick="cycleZoom()">⛶ Zoom</button>
         <button class="pl-act" onclick="navBack()">← Voltar</button>
@@ -1487,7 +1488,16 @@ function loadUrl(idx){
     hls.on(Hls.Events.FRAG_BUFFERED,()=>showPlSpin(false));
   }else{v.src=url;v.load();v.play().catch(()=>loadUrl(pIdx+1));}
   v.onwaiting=()=>showPlSpin(true);
-  v.onplaying=()=>{showPlSpin(false);isPlaying=true;document.getElementById('btn-pp').textContent='⏸';};
+  v.onplaying=()=>{
+    showPlSpin(false);isPlaying=true;
+    document.getElementById('btn-pp').textContent='⏸';
+    // Wire native audioTracks if available
+    if(v.audioTracks){
+      v.audioTracks.onaddtrack=function(){buildAudioMenu();};
+      v.audioTracks.onremovetrack=function(){buildAudioMenu();};
+    }
+    setTimeout(buildAudioMenu,800);
+  };
   v.ontimeupdate=()=>{
     if(v.buffered.length)document.getElementById('pl-buf-fill').style.width=Math.min((v.buffered.end(v.buffered.length-1)/(v.duration||1))*100,100)+'%';
     updateSeek();if(isVOD)autoSavePos();
@@ -1605,26 +1615,63 @@ function navBack(){
 // AUDIO TRACKS
 // ═══════════════════════════════════════════════
 function buildAudioMenu(){
-  if(!hlsP && !hls){return;}
-  var h=hlsP||hls;
-  var tracks=h.audioTracks, cur=h.audioTrack;
   var list=document.getElementById('audio-list');
-  var btn=document.getElementById('audio-act');
   if(!list)return;
   list.innerHTML='';
-  if(!tracks||!tracks.length){if(btn)btn.style.display='none';return;}
-  if(btn)btn.style.display='';
-  tracks.forEach(function(t,i){
-    var row=document.createElement('div');
-    row.className='audio-row'+(i===cur?' active':'');
-    var lang=t.name||t.lang||('Faixa '+(i+1));
-    row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
-    row.onclick=(function(idx,name){return function(){
-      var h2=hlsP||hls;if(h2)h2.audioTrack=idx;
-      buildAudioMenu();toast('🎵 '+name);hideAudioMenu();
-    };})(i,lang);
-    list.appendChild(row);
-  });
+  var v=document.getElementById('player-video')||document.getElementById('pl-video');
+
+  // ── Try HLS.js audio tracks first
+  var hlsRef=hlsP||hls||null;
+  if(hlsRef && hlsRef.audioTracks && hlsRef.audioTracks.length){
+    var tracks=hlsRef.audioTracks, cur=hlsRef.audioTrack;
+    tracks.forEach(function(t,i){
+      var row=document.createElement('div');
+      row.className='audio-row'+(i===cur?' active':'');
+      var lang=t.name||t.lang||t.groupId||('Faixa '+(i+1));
+      row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
+      row.onclick=(function(idx,name){return function(){
+        var h2=hlsP||hls;if(h2){h2.audioTrack=idx;}
+        buildAudioMenu();toast('🎵 '+name);hideAudioMenu();
+      };})(i,lang);
+      list.appendChild(row);
+    });
+    return;
+  }
+
+  // ── Try native HTMLVideoElement audio tracks (Firefox, Safari, alguns MP4)
+  if(v && v.audioTracks && v.audioTracks.length > 0){
+    var nTracks=v.audioTracks;
+    for(var i=0;i<nTracks.length;i++){
+      (function(idx){
+        var t=nTracks[idx];
+        var row=document.createElement('div');
+        row.className='audio-row'+(t.enabled?' active':'');
+        var lang=t.label||t.language||('Faixa '+(idx+1));
+        row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
+        row.onclick=function(){
+          // Disable all, enable selected
+          for(var j=0;j<nTracks.length;j++) nTracks[j].enabled=false;
+          nTracks[idx].enabled=true;
+          buildAudioMenu();toast('🎵 '+lang);hideAudioMenu();
+        };
+        list.appendChild(row);
+      })(i);
+    }
+    return;
+  }
+
+  // ── No multiple tracks found — show info message
+  var row=document.createElement('div');
+  row.className='audio-row';
+  row.style.opacity='0.55';row.style.cursor='default';
+  row.innerHTML='<span class="audio-dot"></span><span>Faixa única / sem seleção</span>';
+  list.appendChild(row);
+
+  // Also show tip for files without audio
+  var tip=document.createElement('div');
+  tip.style.cssText='padding:10px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);line-height:1.5;';
+  tip.textContent='Se o vídeo está sem áudio, tente outra qualidade ou formato no servidor.';
+  list.appendChild(tip);
 }
 function toggleAudioMenu(){
   var m=document.getElementById('audio-menu');
