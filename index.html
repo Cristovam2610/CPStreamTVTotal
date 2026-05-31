@@ -17,18 +17,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;700&family=Source+Sans+3:wght@300;400;600&display=swap');
 
 :root{
-  --scroll-w:10px;--scroll-thumb:#3a3a5c;--scroll-track:#12121e;
   --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26; --border:#2a2a3e;
   --accent:#2436d3; --accent2:#ff6b6b; --blue:#2436d3; --text:#f0f0f5;
   --muted:#6b6b8a; --gold:#ffd60a; --green:#2dc653; --r:12px;
   --sidebar:180px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-::-webkit-scrollbar{width:10px;height:10px;}
-::-webkit-scrollbar-track{background:#12121e;border-radius:6px;}
-::-webkit-scrollbar-thumb{background:#3a3a5c;border-radius:6px;}
-::-webkit-scrollbar-thumb:hover{background:#5a5a8c;}
-*{scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source Sans 3',sans-serif;font-size:16px;overflow:hidden;}
 
 /* ── BOOT ── */
@@ -217,7 +211,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
   border-radius:6px;line-height:1;transition:all .15s;
 }
 #cat-close:hover{background:rgba(255,255,255,.08);color:var(--text);}
-#cat-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
+#cat-list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 0;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 .cat-item{
   padding:12px 16px;font-size:14px;cursor:pointer;
   border-left:3px solid transparent;
@@ -238,7 +232,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #search-input{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-size:14px;padding:9px 14px;width:240px;outline:none;font-family:'Source Sans 3',sans-serif;transition:border-color .2s;}
 #search-input:focus{border-color:var(--accent);}
 #item-count{font-size:13px;color:var(--muted);white-space:nowrap;}
-#content-body{flex:1;overflow-y:auto;padding:18px 22px;scrollbar-width:auto;scrollbar-color:#3a3a5c #12121e;}
+#content-body{flex:1;overflow-y:auto;padding:18px 22px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 
 /* ── GRIDS ── */
 .ch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;}
@@ -275,24 +269,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #player-video{width:100%;height:100%;object-fit:contain;display:block;}
 #player-video.zoom-fill{object-fit:fill;}
 #player-video.zoom-cover{object-fit:cover;}
-
-/* ── SMART BUFFER INDICATOR ── */
-#buf-indicator{
-  position:absolute;bottom:96px;left:50%;transform:translateX(-50%);
-  background:rgba(10,10,20,.85);backdrop-filter:blur(10px);
-  border:1px solid rgba(36,54,211,.5);border-radius:99px;
-  padding:7px 20px;font-size:13px;color:#c0c8ff;
-  letter-spacing:.4px;pointer-events:none;
-  opacity:0;transition:opacity .5s;z-index:10;white-space:nowrap;
-}
-#buf-indicator b{color:#7eb3ff;font-weight:700;}
-#buf-indicator.show{opacity:1;}
-#buf-ahead-badge{
-  display:none;
-  background:rgba(36,54,211,.2);border:1px solid rgba(36,54,211,.4);
-  border-radius:6px;padding:2px 10px;font-size:11px;color:#91b4ff;
-  margin-left:8px;vertical-align:middle;white-space:nowrap;letter-spacing:.3px;
-}
 #pl-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border:6px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite;display:none;}
 #pl-err{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(230,57,70,.15);border:1px solid rgba(230,57,70,.4);color:var(--accent2);padding:16px 28px;border-radius:var(--r);font-size:17px;display:none;text-align:center;}
 #zoom-flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.12);border-radius:var(--r);padding:14px 36px;font-family:'Oswald',sans-serif;font-size:32px;letter-spacing:3px;pointer-events:none;opacity:0;transition:opacity .4s;}
@@ -394,22 +370,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
 #toast.show{opacity:1;}
 #toast.err{border-color:var(--accent);color:var(--accent2);}
 #toast.ok{border-color:var(--green);color:var(--green);}
-
-/* ── AUDIO TRACK MENU ── */
-#audio-menu{position:absolute;bottom:160px;right:40px;
-  background:var(--panel);border:1px solid var(--border);border-radius:var(--r);
-  min-width:240px;max-height:320px;overflow-y:auto;
-  display:none;box-shadow:0 10px 40px rgba(0,0,0,.9);z-index:50;}
-#audio-menu.show{display:block;}
-.audio-title{padding:10px 16px;font-size:11px;font-weight:700;
-  color:var(--muted);text-transform:uppercase;letter-spacing:1px;
-  border-bottom:1px solid var(--border);}
-.audio-row{padding:12px 16px;font-size:14px;cursor:pointer;display:flex;
-  align-items:center;gap:10px;transition:background .12s;color:var(--soft);}
-.audio-row:hover{background:rgba(255,255,255,.05);color:var(--text);}
-.audio-row.active{color:var(--blue);font-weight:700;}
-.audio-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0;}
-.audio-row.active .audio-dot{background:var(--blue);}
 </style>
 </head>
 <body>
@@ -486,10 +446,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
           <div class="adm-row">
             <div class="adm-field"><label>Nome completo</label><input id="adm-name" type="text" placeholder="Nome do cliente"/></div>
             <div class="adm-field"><label>WhatsApp</label><input id="adm-wpp" type="text" placeholder="(51) 99999-9999"/></div>
-          </div>
-          <div class="adm-row">
-            <div class="adm-field"><label>Usuário IPTV</label><input id="adm-iptv-user" type="text" placeholder="usuario_iptv"/></div>
-            <div class="adm-field"><label>Senha IPTV</label><input id="adm-iptv-pass" type="text" placeholder="senha_iptv"/></div>
           </div>
           <div class="adm-row">
             <div class="adm-field"><label>Plano</label>
@@ -604,16 +560,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
   <div id="pl-spin"></div>
   <div id="pl-err"></div>
   <div id="zoom-flash"></div>
-  <div id="buf-indicator">💾 Calculando buffer...</div>
   <div id="resume-bar">
     <span style="flex:1">⏱ Continuar de onde parou?</span>
     <button class="resume-btn" id="resume-yes-btn" onclick="doResume()">▶ Retomar</button>
     <button class="resume-btn sec" onclick="closeResume()">Do início</button>
-  </div>
-  <!-- Audio Track Menu -->
-  <div id="audio-menu">
-    <div class="audio-title">🎵 Faixa de Áudio</div>
-    <div id="audio-list"></div>
   </div>
   <div id="player-ui">
     <div id="pl-top">
@@ -630,7 +580,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
       </div>
       <div id="pl-actions">
         <button class="pl-act" id="fav-act" onclick="toggleFavCurrent()">☆ Fav</button>
-        <button class="pl-act" id="audio-act" onclick="toggleAudioMenu()">🎵 Áudio</button>
         <button class="pl-act" id="mute-act" onclick="toggleMute()">🔊</button>
         <button class="pl-act" id="zoom-act" onclick="cycleZoom()">⛶ Zoom</button>
         <button class="pl-act" onclick="navBack()">← Voltar</button>
@@ -642,10 +591,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Source
           <div id="pl-seek-fill"></div>
           <div id="pl-seek-dot"></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-          <div id="pl-time"></div>
-          <span id="buf-ahead-badge"></span>
-        </div>
+        <div id="pl-time"></div>
       </div>
       <div id="pl-bottom">
         <div class="pl-btn" onclick="prevItem()">⏮</div>
@@ -755,6 +701,10 @@ const ADMIN_HASH=hashPwd('Porto@legre1965');
 function getDeviceId(){let d=tvGet('stv_device');if(!d){d='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);tvSet('stv_device',d);}return d;}
 const DEVICE_ID=getDeviceId();
 
+// ── Credenciais IPTV padrão (fixas no código — editáveis pelo Admin)
+const DEFAULT_IPTV_USER='venrkdml7n02';
+const DEFAULT_IPTV_PASS='71985344834';
+
 // ── Global state
 let currentUser=null,isAdmin=false,sessionDocId=null,serverConfigs=null;
 let CFG={server:'',user:'',pass:'',isM3U:false};
@@ -837,13 +787,8 @@ async function doAuthLogin(){
     await loadServerConfigs();
     const sIdx=data.srvIdx||0;
     const srv=serverConfigs['s'+sIdx]||serverConfigs['s0'];
-    // Use user's own IPTV credentials; fallback to server defaults
-    const iptvUser=data.iptvUser||srv.iptv_user||'';
-    const iptvPass=data.iptvPass||srv.iptv_pass||'';
-    CFG={server:srv.url,user:iptvUser,pass:iptvPass,isM3U:false};
-    currentUser={docId:doc.id,username,name:data.name||username,srvIdx:sIdx,
-      plan:data.plan,expireAt:data.expireAt||null,isAdmin:data.isAdmin||false,
-      maxDevices:maxDev,iptvUser,iptvPass,ts:Date.now()};
+    CFG={server:srv.url,user:srv.iptv_user,pass:srv.iptv_pass,isM3U:false};
+    currentUser={docId:doc.id,username,name:data.name||username,srvIdx:sIdx,plan:data.plan,expireAt:data.expireAt||null,isAdmin:data.isAdmin||false,maxDevices:maxDev,ts:Date.now()};
     tvSet('stv_session',JSON.stringify(currentUser));
     if(data.isAdmin){isAdmin=true;document.getElementById('btn-admin').style.display='';}
     hideAuthPage();document.getElementById('boot').classList.add('hide');
@@ -872,9 +817,7 @@ async function checkSavedSession(){
     if(saved.isAdmin)isAdmin=true;
     await loadServerConfigs();
     const srv=serverConfigs['s'+(saved.srvIdx||0)]||serverConfigs['s0'];
-    const _iu=saved.iptvUser||srv.iptv_user||'';
-    const _ip=saved.iptvPass||srv.iptv_pass||'';
-    CFG={server:srv.url,user:_iu,pass:_ip,isM3U:false};
+    CFG={server:srv.url,user:srv.iptv_user,pass:srv.iptv_pass,isM3U:false};
     currentUser.ts=Date.now();tvSet('stv_session',JSON.stringify(currentUser));
     renewSession();
     document.getElementById('boot').classList.add('hide');
@@ -933,16 +876,21 @@ async function loadServerConfigs(){
   if(serverConfigs)return;
   try{
     const doc=await Promise.race([db.collection('config').doc('servers').get(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),4000))]);
-    if(doc.exists){serverConfigs=doc.data();_cacheSrv();return;}
+    if(doc.exists){
+      serverConfigs=doc.data();
+      // Garante credenciais padrão em qualquer servidor sem credenciais no Firebase
+      for(let i=0;i<5;i++){const k='s'+i;if(!serverConfigs[k])serverConfigs[k]={};if(!serverConfigs[k].iptv_user)serverConfigs[k].iptv_user=DEFAULT_IPTV_USER;if(!serverConfigs[k].iptv_pass)serverConfigs[k].iptv_pass=DEFAULT_IPTV_PASS;}
+      _cacheSrv();return;
+    }
   }catch(_){}
   try{const ls=JSON.parse(tvGet('stv_srv_cfg')||'null');if(ls){serverConfigs=ls;return;}}catch(_){}
-  // Default 5 servers
+  // Default 5 servers com credenciais fixas como padrão
   serverConfigs={
-    s0:{url:'https://toppcard.fun',     iptv_user:'',iptv_pass:'',enabled:true},
-    s1:{url:'http://streams4k.xyz',     iptv_user:'',iptv_pass:'',enabled:true},
-    s2:{url:'https://pedidoonline.space',iptv_user:'',iptv_pass:'',enabled:true},
-    s3:{url:'https://adplayer.online',  iptv_user:'',iptv_pass:'',enabled:true},
-    s4:{url:'',                         iptv_user:'',iptv_pass:'',enabled:false},
+    s0:{url:'https://toppcard.fun',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s1:{url:'http://streams4k.xyz',      iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s2:{url:'https://pedidoonline.space', iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s3:{url:'https://adplayer.online',   iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true},
+    s4:{url:'',                          iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:false},
   };
   _cacheSrv();
 }
@@ -956,10 +904,8 @@ function switchServer(idx){
   if(!s||!s.url){toast('S'+(idx+1)+' sem URL — configure no Admin','err');return;}
   if(s.enabled===false){toast('S'+(idx+1)+' desativado','err');return;}
   if(!s.iptv_user||!s.iptv_pass){toast('S'+(idx+1)+' sem credenciais IPTV','err');return;}
-  const _u=currentUser?.iptvUser||s.iptv_user||'';
-  const _p=currentUser?.iptvPass||s.iptv_pass||'';
-  CFG={server:s.url,user:_u,pass:_p,isM3U:false};
-  if(currentUser){currentUser.srvIdx=idx;tvSet('stv_session',JSON.stringify(currentUser));}
+  CFG={server:s.url,user:s.iptv_user,pass:s.iptv_pass,isM3U:false};
+  currentUser.srvIdx=idx;tvSet('stv_session',JSON.stringify(currentUser));
   clearAllCache();updateSrvUI(idx);
   if(document.getElementById('app').classList.contains('show')) goFavsSection();
   toast('✅ S'+(idx+1)+' ativado','ok');
@@ -983,34 +929,9 @@ function closeAdmin(){document.getElementById('admin-modal').classList.remove('s
 function admTab(tab,btn){document.querySelectorAll('.adm-tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');['new','list','servers','sessions'].forEach(t=>document.getElementById('adm-tab-'+t).style.display=t===tab?'':'none');if(tab==='list')loadUserList();if(tab==='servers')renderSrvEditor();if(tab==='sessions')loadSessions();}
 
 async function createUser(){
-  const username=(document.getElementById('adm-user').value||'').trim().toLowerCase();
-  const password=(document.getElementById('adm-pass').value||'').trim();
-  const name=(document.getElementById('adm-name').value||'').trim();
-  const wpp=(document.getElementById('adm-wpp').value||'').trim();
-  const iptvUser=(document.getElementById('adm-iptv-user')?.value||'').trim();
-  const iptvPass=(document.getElementById('adm-iptv-pass')?.value||'').trim();
-  const plan=parseInt(document.getElementById('adm-plan').value);
-  const srvIdx=parseInt(document.getElementById('adm-server').value);
-  const maxDev=parseInt(document.getElementById('adm-devices').value);
-  if(!username||!password||!name){showAdmMsg('Preencha usuário, senha e nome.','err');return;}
-  if(password.length<8){showAdmMsg('Senha mínimo 8 caracteres.','err');return;}
-  try{
-    const ex=await db.collection('users').where('username','==',username).limit(1).get();
-    if(!ex.empty){showAdmMsg('Usuário já existe!','err');return;}
-    const expireAt=plan===0?null:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+plan*24*60*60*1000));
-    await db.collection('users').add({
-      username,passHash:hashPwd(password),name,plan,srvIdx,
-      maxDevices:maxDev,wpp:wpp||'',
-      iptvUser:iptvUser||'',  // user's own IPTV credentials
-      iptvPass:iptvPass||'',
-      active:true,isAdmin:false,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp(),expireAt
-    });
-    showAdmMsg('✅ "'+username+'" criado!','ok');
-    ['adm-user','adm-pass','adm-name','adm-wpp','adm-iptv-user','adm-iptv-pass'].forEach(id=>{
-      const el=document.getElementById(id);if(el)el.value='';
-    });
-  }catch(e){showAdmMsg('❌ Erro: '+e.message,'err');}
+  const username=document.getElementById('adm-user').value.trim().toLowerCase();const password=document.getElementById('adm-pass').value.trim();const name=document.getElementById('adm-name').value.trim();const wpp=document.getElementById('adm-wpp').value.trim();const plan=parseInt(document.getElementById('adm-plan').value);const srvIdx=parseInt(document.getElementById('adm-server').value);const maxDev=parseInt(document.getElementById('adm-devices').value);
+  if(!username||!password||!name){showAdmMsg('Preencha usuário, senha e nome.','err');return;}if(password.length<8){showAdmMsg('Senha mínimo 8 caracteres.','err');return;}
+  try{const ex=await db.collection('users').where('username','==',username).limit(1).get();if(!ex.empty){showAdmMsg('Usuário já existe!','err');return;}const expireAt=plan===0?null:firebase.firestore.Timestamp.fromDate(new Date(Date.now()+plan*24*60*60*1000));await db.collection('users').add({username,passHash:hashPwd(password),name,plan,srvIdx,maxDevices:maxDev,wpp:wpp||'',active:true,isAdmin:false,createdAt:firebase.firestore.FieldValue.serverTimestamp(),expireAt});showAdmMsg('✅ "'+username+'" criado!','ok');['adm-user','adm-pass','adm-name','adm-wpp'].forEach(id=>document.getElementById(id).value='');}catch(e){showAdmMsg('❌ Erro: '+e.message,'err');}
 }
 function showAdmMsg(msg,type){const el=document.getElementById('adm-msg');el.textContent=msg;el.className='adm-msg '+type;el.style.display='block';setTimeout(()=>el.style.display='none',5000);}
 
@@ -1032,17 +953,17 @@ function renderSrvEditor(){
   const ed=document.getElementById('srv-editor');ed.innerHTML='';
   const labels=['S1','S2','S3','S4','S5'];
   for(let i=0;i<5;i++){
-    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:'',iptv_pass:'',enabled:true};
+    const s=serverConfigs?.['s'+i]||{url:'',iptv_user:DEFAULT_IPTV_USER,iptv_pass:DEFAULT_IPTV_PASS,enabled:true};
     const on=s.enabled!==false;
     const div=document.createElement('div');div.className='srv-block';
-    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||'')}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||'')}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
+    div.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="srv-lbl">${labels[i]}</div><button id="srv-tog-${i}" class="srv-toggle ${on?'on':'off'}" onclick="toggleSrvEnabled(${i})">${on?'🟢 ATIVO':'🔴 INATIVO'}</button></div><div class="adm-row"><div class="adm-field"><label>URL</label><input id="srv-url-${i}" type="text" value="${esc(s.url||'')}" placeholder="https://servidor.com"/></div><div class="adm-field"><label>Usuário IPTV</label><input id="srv-usr-${i}" type="text" value="${esc(s.iptv_user||DEFAULT_IPTV_USER)}" placeholder="usuário"/></div></div><div class="adm-row" style="margin-top:8px"><div class="adm-field"><label>Senha IPTV</label><input id="srv-pwd-${i}" type="text" value="${esc(s.iptv_pass||DEFAULT_IPTV_PASS)}" placeholder="senha"/></div><div class="srv-btn-row"><button onclick="testServer(${i})" class="adm-btn sec">🔌 Testar</button></div></div>`;
     ed.appendChild(div);
   }
 }
 function toggleSrvEnabled(i){if(!serverConfigs)return;const s=serverConfigs['s'+i]||{};s.enabled=!(s.enabled!==false);serverConfigs['s'+i]=s;const btn=document.getElementById('srv-tog-'+i);if(btn){btn.className='srv-toggle '+(s.enabled?'on':'off');btn.textContent=s.enabled?'🟢 ATIVO':'🔴 INATIVO';}updateSrvUI();}
 async function saveServers(){
   const data={};
-  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||'').trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||'').trim(),enabled:cur.enabled!==false};}
+  for(let i=0;i<5;i++){const cur=serverConfigs?.['s'+i]||{};data['s'+i]={url:(document.getElementById('srv-url-'+i).value||'').trim().replace(/\/+$/,''),iptv_user:(document.getElementById('srv-usr-'+i).value||DEFAULT_IPTV_USER).trim(),iptv_pass:(document.getElementById('srv-pwd-'+i).value||DEFAULT_IPTV_PASS).trim(),enabled:cur.enabled!==false};}
   serverConfigs=data;_cacheSrv();
   try{await db.collection('config').doc('servers').set(data);showAdmSrvMsg('✅ Servidores salvos!','ok');}catch(e){showAdmSrvMsg('✅ Salvo localmente!','ok');}
   clearAllCache();updateSrvUI();
@@ -1497,139 +1418,24 @@ function openPlayer(urls,resumePos){
   loadUrl(0);showOverlay();
 }
 
-// ══════════════════════════════════════════════════════════════
-// SMART BUFFER — detecta memória disponível e ajusta dinâmicamente
-// ══════════════════════════════════════════════════════════════
-var _bufCfg={maxBuf:30,backBuf:0,maxBufBytes:50*1024*1024,detected:false};
-
-function detectBufferCapacity(){
-  if(_bufCfg.detected)return _bufCfg;
-  var ram=4; // fallback 4GB
-  try{if(navigator.deviceMemory)ram=navigator.deviceMemory;}catch(e){}
-  // Estima memória livre para buffer (usa ~25% da RAM disponível, máx 2GB)
-  var availMB=Math.min(ram*1024*0.25, 2048);
-  // Converte MB disponíveis em segundos de buffer (estimando ~2Mbps médio de stream)
-  // 2Mbps = 250KB/s → 1 min ≈ 15MB → availMB/15 * 60 = segundos
-  var maxSec=Math.floor((availMB/15)*60);
-  // Limites: mínimo 60s, máximo filme inteiro (14400s = 4h)
-  maxSec=Math.max(60, Math.min(maxSec, 14400));
-  _bufCfg={
-    maxBuf: maxSec,
-    backBuf: Math.min(Math.floor(maxSec*0.1), 300), // 10% como back-buffer, máx 5min
-    maxBufBytes: Math.floor(availMB*1024*1024),
-    ramGB: ram,
-    maxSec: maxSec,
-    detected: true
-  };
-  return _bufCfg;
-}
-
-function getBufLabel(sec){
-  if(sec>=3600)return Math.floor(sec/3600)+'h '+(Math.floor((sec%3600)/60))+'min';
-  if(sec>=60)return Math.floor(sec/60)+' min';
-  return sec+'s';
-}
-
-var _bufIndicatorTimer=null;
-function showBufIndicator(cfg){
-  var el=document.getElementById('buf-indicator');
-  if(!el)return;
-  var ramLabel=cfg.ramGB>=1?(cfg.ramGB>=2?cfg.ramGB+'GB':'~'+cfg.ramGB+'GB'):'<1GB';
-  el.innerHTML='💾 Buffer: <b>'+getBufLabel(cfg.maxSec)+'</b> · RAM: '+ramLabel;
-  el.classList.add('show');
-  clearTimeout(_bufIndicatorTimer);
-  _bufIndicatorTimer=setTimeout(function(){el.classList.remove('show');},5000);
-}
-
 function loadUrl(idx){
   if(idx>=pUrls.length){showPlSpin(false);showPlErr(true,'⚠ Stream indisponível.');return;}
   pIdx=idx;const url=pUrls[idx];const v=document.getElementById('player-video');
   if(hls){hls.destroy();hls=null;}v.src='';
-
-  // Detecta capacidade e define configuração de buffer
-  var bc=detectBufferCapacity();
-  // Para canais ao vivo usa buffer menor (30s), para VOD usa o máximo disponível
-  var bufLen   = isVOD ? bc.maxBuf  : 30;
-  var backLen  = isVOD ? bc.backBuf : 0;
-  var bufBytes = isVOD ? bc.maxBufBytes : 50*1024*1024;
-  var lowLat   = !isVOD; // baixa latência só para ao vivo
-
   if(url.includes('.m3u8')&&Hls.isSupported()){
-    hls=new Hls({
-      enableWorker: true,
-      lowLatencyMode: lowLat,
-      backBufferLength: backLen,
-      maxBufferLength: bufLen,
-      maxMaxBufferLength: bufLen,
-      maxBufferSize: bufBytes,
-      maxBufferHole: 0.5,
-      highBufferWatchdogPeriod: 10,
-      nudgeOffset: 0.2,
-      nudgeMaxRetry: 5,
-      startLevel: -1,
-      abrEwmaDefaultEstimate: 1500000,
-      xhrSetup:xhr=>{try{xhr.setRequestHeader('User-Agent',UA);}catch(e){}}
-    });
-    hls.loadSource(url);
-    hls.attachMedia(v);
-    hls.on(Hls.Events.MANIFEST_PARSED,()=>{
-      v.play().catch(()=>{});
-      showPlSpin(false);mErr=0;isPlaying=true;
-      document.getElementById('btn-pp').textContent='⏸';
-      setTimeout(buildAudioMenu,600);
-      // Mostra indicador de buffer apenas para VOD
-      if(isVOD)showBufIndicator(bc);
-    });
-    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED,()=>buildAudioMenu());
-    hls.on(Hls.Events.FRAG_BUFFERED,()=>{
-      showPlSpin(false);
-      updateSmartBufBar(v);
-    });
-    hls.on(Hls.Events.ERROR,(_,d)=>{
-      if(!d.fatal)return;
-      if(d.type===Hls.ErrorTypes.MEDIA_ERROR&&mErr<2){mErr++;hls.recoverMediaError();}
-      else{hls.destroy();hls=null;loadUrl(pIdx+1);}
-    });
-  }else{
-    v.src=url;v.load();v.play().catch(()=>loadUrl(pIdx+1));
-  }
-
+    hls=new Hls({enableWorker:false,lowLatencyMode:true,backBufferLength:0,maxBufferLength:30,startLevel:-1,xhrSetup:xhr=>{try{xhr.setRequestHeader('User-Agent',UA);}catch(e){}}});
+    hls.loadSource(url);hls.attachMedia(v);
+    hls.on(Hls.Events.MANIFEST_PARSED,()=>{v.play().catch(()=>{});showPlSpin(false);mErr=0;isPlaying=true;document.getElementById('btn-pp').textContent='⏸';});
+    hls.on(Hls.Events.ERROR,(_,d)=>{if(!d.fatal)return;if(d.type===Hls.ErrorTypes.MEDIA_ERROR&&mErr<2){mErr++;hls.recoverMediaError();}else{hls.destroy();hls=null;loadUrl(pIdx+1);}});
+    hls.on(Hls.Events.FRAG_BUFFERED,()=>showPlSpin(false));
+  }else{v.src=url;v.load();v.play().catch(()=>loadUrl(pIdx+1));}
   v.onwaiting=()=>showPlSpin(true);
-  v.onplaying=()=>{
-    showPlSpin(false);isPlaying=true;
-    document.getElementById('btn-pp').textContent='⏸';
-    if(v.audioTracks){
-      v.audioTracks.onaddtrack=function(){buildAudioMenu();};
-      v.audioTracks.onremovetrack=function(){buildAudioMenu();};
-    }
-    setTimeout(buildAudioMenu,800);
-  };
+  v.onplaying=()=>{showPlSpin(false);isPlaying=true;document.getElementById('btn-pp').textContent='⏸';};
   v.ontimeupdate=()=>{
-    updateSmartBufBar(v);
+    if(v.buffered.length)document.getElementById('pl-buf-fill').style.width=Math.min((v.buffered.end(v.buffered.length-1)/(v.duration||1))*100,100)+'%';
     updateSeek();if(isVOD)autoSavePos();
   };
   v.onerror=()=>{if(!hls)loadUrl(pIdx+1);};
-}
-
-function updateSmartBufBar(v){
-  if(!v||!v.buffered||!v.buffered.length)return;
-  var buf=v.buffered,dur=v.duration||0,cur=v.currentTime||0;
-  var bufEnd=buf.end(buf.length-1);
-  // Barra de buffer existente (progresso azul)
-  var pct=dur>0?Math.min((bufEnd/dur)*100,100):0;
-  var el=document.getElementById('pl-buf-fill');
-  if(el)el.style.width=pct+'%';
-  // Indicador de segundos à frente
-  var ahead=Math.max(0,bufEnd-cur);
-  var badgeEl=document.getElementById('buf-ahead-badge');
-  if(badgeEl){
-    if(ahead>5){
-      badgeEl.textContent='⬛ '+getBufLabel(Math.floor(ahead))+' em cache';
-      badgeEl.style.display='inline-block';
-    }else{
-      badgeEl.style.display='none';
-    }
-  }
 }
 
 function stopAndClosePlayer(){
@@ -1737,77 +1543,6 @@ function navBack(){
 // ══════════════════════════════════════════════════════════════
 // KEYBOARD
 // ══════════════════════════════════════════════════════════════
-
-// ═══════════════════════════════════════════════
-// AUDIO TRACKS
-// ═══════════════════════════════════════════════
-function buildAudioMenu(){
-  var list=document.getElementById('audio-list');
-  if(!list)return;
-  list.innerHTML='';
-  var v=document.getElementById('player-video')||document.getElementById('pl-video');
-
-  // ── Try HLS.js audio tracks first
-  var hlsRef=hlsP||hls||null;
-  if(hlsRef && hlsRef.audioTracks && hlsRef.audioTracks.length){
-    var tracks=hlsRef.audioTracks, cur=hlsRef.audioTrack;
-    tracks.forEach(function(t,i){
-      var row=document.createElement('div');
-      row.className='audio-row'+(i===cur?' active':'');
-      var lang=t.name||t.lang||t.groupId||('Faixa '+(i+1));
-      row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
-      row.onclick=(function(idx,name){return function(){
-        var h2=hlsP||hls;if(h2){h2.audioTrack=idx;}
-        buildAudioMenu();toast('🎵 '+name);hideAudioMenu();
-      };})(i,lang);
-      list.appendChild(row);
-    });
-    return;
-  }
-
-  // ── Try native HTMLVideoElement audio tracks (Firefox, Safari, alguns MP4)
-  if(v && v.audioTracks && v.audioTracks.length > 0){
-    var nTracks=v.audioTracks;
-    for(var i=0;i<nTracks.length;i++){
-      (function(idx){
-        var t=nTracks[idx];
-        var row=document.createElement('div');
-        row.className='audio-row'+(t.enabled?' active':'');
-        var lang=t.label||t.language||('Faixa '+(idx+1));
-        row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
-        row.onclick=function(){
-          // Disable all, enable selected
-          for(var j=0;j<nTracks.length;j++) nTracks[j].enabled=false;
-          nTracks[idx].enabled=true;
-          buildAudioMenu();toast('🎵 '+lang);hideAudioMenu();
-        };
-        list.appendChild(row);
-      })(i);
-    }
-    return;
-  }
-
-  // ── No multiple tracks found — show info message
-  var row=document.createElement('div');
-  row.className='audio-row';
-  row.style.opacity='0.55';row.style.cursor='default';
-  row.innerHTML='<span class="audio-dot"></span><span>Faixa única / sem seleção</span>';
-  list.appendChild(row);
-
-  // Also show tip for files without audio
-  var tip=document.createElement('div');
-  tip.style.cssText='padding:10px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);line-height:1.5;';
-  tip.textContent='Se o vídeo está sem áudio, tente outra qualidade ou formato no servidor.';
-  list.appendChild(tip);
-}
-function toggleAudioMenu(){
-  var m=document.getElementById('audio-menu');
-  if(m){m.classList.toggle('show');showOverlay();}
-}
-function hideAudioMenu(){
-  var m=document.getElementById('audio-menu');if(m)m.classList.remove('show');
-}
-
 document.addEventListener('keydown',e=>{
   const k=e.keyCode||e.which;
   if(k===27||k===8||k===10009){e.preventDefault();navBack();return;}
