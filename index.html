@@ -1430,7 +1430,7 @@ function fmtAgo(ts){const d=(Date.now()-ts)/1000;if(d<60)return'Agora';if(d<3600
 // ══════════════════════════════════════════════════════════════
 // VOD MODAL
 // ══════════════════════════════════════════════════════════════
-function openVodModal(item,type){
+async function openVodModal(item,type){
   modalItem=item;modalType=type;
   document.getElementById('vm-title').textContent=item.name||item.title||'';
   const poster=item.stream_icon||item.cover||'';
@@ -1438,13 +1438,83 @@ function openVodModal(item,type){
   if(poster){img.src=poster;img.style.display='block';nop.style.display='none';}else{img.style.display='none';nop.style.display='flex';}
   const tags=[];
   if(item.year||item.releaseDate)tags.push(item.year||item.releaseDate);
-  if(item.rating)tags.push('⭐ '+item.rating);if(item.genre)tags.push(item.genre);if(item.duration)tags.push('⏱ '+item.duration);
+  if(item.rating)tags.push('\u2b50 '+item.rating);if(item.genre)tags.push(item.genre);if(item.duration)tags.push('\u23f1 '+item.duration);
   document.getElementById('vm-tags').innerHTML=tags.map(t=>`<span class="vm-tag">${esc(String(t))}</span>`).join('');
-  document.getElementById('vm-plot').textContent=item.plot||item.plot_simple||item.description||'Sinopse não disponível.';
-  document.getElementById('vm-play-btn').textContent=type==='series'?'▶ Ver Episódios':'▶ Assistir';
+  document.getElementById('vm-play-btn').textContent=type==='series'?'\u25b6 Ver Epis\u00f3dios':'\u25b6 Assistir';
   const on=isFavSid(item.stream_id||item.series_id||'');
-  const fb=document.getElementById('vm-fav-btn');fb.textContent=on?'★ Favoritado':'☆ Favoritar';fb.classList.toggle('on',on);
+  const fb=document.getElementById('vm-fav-btn');fb.textContent=on?'\u2605 Favoritado':'\u2606 Favoritar';fb.classList.toggle('on',on);
+
+  // Mostra sinopse inline se j\u00e1 disponível, ou busca via API
+  const plotEl=document.getElementById('vm-plot');
+  const plotInline=item.plot||item.plot_simple||item.description||'';
+  if(plotInline){
+    plotEl.textContent=plotInline;
+  } else {
+    plotEl.innerHTML='<span style="color:var(--muted);font-style:italic;font-size:13px">\u23f3 Carregando sinopse...</span>';
+    fetchItemDetails(item,type,plotEl);
+  }
+
   document.getElementById('vod-modal').classList.add('show');
+}
+
+async function fetchItemDetails(item,type,plotEl){
+  try{
+    let info=null;
+    if(type==='movie'||type==='movies'){
+      const raw=await Promise.race([
+        apiGet('get_vod_info','&vod_id='+item.stream_id),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))
+      ]);
+      info=raw?.info||raw||null;
+    } else if(type==='series'){
+      const raw=await Promise.race([
+        apiGet('get_series_info','&series_id='+(item.series_id||item.stream_id)),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000))
+      ]);
+      info=raw?.info||null;
+    }
+    if(!info){plotEl.textContent='Sinopse n\u00e3o dispon\u00edvel.';return;}
+
+    // Atualiza sinopse
+    const plot=info.plot||info.plot_simple||info.description||info.overview||'';
+    plotEl.textContent=plot||'Sinopse n\u00e3o dispon\u00edvel.';
+
+    // Atualiza poster se vier um melhor
+    const newPoster=info.movie_image||info.cover||'';
+    if(newPoster){
+      const imgEl=document.getElementById('vm-img');
+      if(!imgEl.src||imgEl.naturalWidth===0){
+        imgEl.src=newPoster;imgEl.style.display='block';
+        document.getElementById('vm-nop').style.display='none';
+      }
+    }
+
+    // Atualiza tags com dados mais ricos
+    const newTags=[];
+    const yr=info.year||info.releaseDate||item.year||'';
+    const rt=info.rating||item.rating||'';
+    const gn=info.genre||item.genre||'';
+    const durSecs=info.duration_secs?Math.floor(info.duration_secs/60)+'min':'';
+    const dur=info.duration||durSecs||item.duration||'';
+    const dir=info.director||'';
+    const cast=(info.cast||'').split(',').slice(0,3).join(', ');
+    if(yr)newTags.push(yr);
+    if(rt)newTags.push('\u2b50 '+rt);
+    if(gn)newTags.push(gn);
+    if(dur)newTags.push('\u23f1 '+dur);
+    if(dir)newTags.push('\U0001f3ac '+dir);
+    if(cast)newTags.push('\U0001f465 '+cast);
+    if(newTags.length){
+      document.getElementById('vm-tags').innerHTML=newTags.map(t=>`<span class="vm-tag">${esc(String(t))}</span>`).join('');
+    }
+
+    // Cache no item para n\u00e3o buscar de novo
+    if(modalItem&&(modalItem.stream_id===item.stream_id||modalItem.series_id===item.series_id)){
+      Object.assign(modalItem,{plot,year:yr,rating:rt,genre:gn,duration:dur});
+    }
+  }catch(e){
+    plotEl.textContent='Sinopse n\u00e3o dispon\u00edvel.';
+  }
 }
 function closeVodModal(){document.getElementById('vod-modal').classList.remove('show');}
 function playFromModal(){closeVodModal();if(!modalItem)return;if(modalType==='series')openEpModal(modalItem);else{modalItem._type=modalType;playMovie(modalItem);}}
