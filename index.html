@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="CPStreamTVTotal"/>
 <title>CPStreamTVTotal</title>
+<link rel="manifest" href="manifest.json"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -1833,64 +1835,130 @@ function navBack(){
 // ═══════════════════════════════════════════════
 // AUDIO TRACKS
 // ═══════════════════════════════════════════════
-function buildAudioMenu(){
+// Mapa de flags e nomes de idioma
+var _langMap={
+  'por':'🇧🇷 Português','pt':'🇧🇷 Português','pt-br':'🇧🇷 Português (BR)',
+  'pt-pt':'🇵🇹 Português (PT)','portugues':'🇧🇷 Português','portuguese':'🇧🇷 Português',
+  'eng':'🇺🇸 English','en':'🇺🇸 English','english':'🇺🇸 English','ingles':'🇺🇸 Inglês',
+  'spa':'🇪🇸 Español','es':'🇪🇸 Español','spanish':'🇪🇸 Español','espanhol':'🇪🇸 Espanhol',
+  'fra':'🇫🇷 Français','fr':'🇫🇷 Français','french':'🇫🇷 Français',
+  'deu':'🇩🇪 Deutsch','de':'🇩🇪 Deutsch','german':'🇩🇪 Alemão',
+  'ita':'🇮🇹 Italiano','it':'🇮🇹 Italiano','italian':'🇮🇹 Italiano',
+  'jpn':'🇯🇵 日本語','ja':'🇯🇵 日本語','japanese':'🇯🇵 Japonês',
+  'kor':'🇰🇷 한국어','ko':'🇰🇷 한국어','korean':'🇰🇷 Coreano',
+  'zho':'🇨🇳 中文','zh':'🇨🇳 中文','chinese':'🇨🇳 Chinês',
+  'rus':'🇷🇺 Русский','ru':'🇷🇺 Russo',
+  'ara':'🇸🇦 العربية','ar':'🇸🇦 Árabe',
+  'hin':'🇮🇳 हिंदी','hi':'🇮🇳 Hindi',
+  'dub':'🎙 Dublado','leg':'📝 Legendado','original':'🎬 Original',
+  'commentary':'💬 Comentário','descriptive':'♿ Descritivo'
+};
+function _langLabel(t){
+  var raw=(t.name||t.lang||t.language||t.groupId||'').toLowerCase().trim();
+  if(!raw)return null;
+  // Busca exata
+  if(_langMap[raw])return _langMap[raw];
+  // Busca parcial
+  for(var k in _langMap){if(raw.includes(k))return _langMap[k];}
+  // Retorna original capitalizado
+  return raw.charAt(0).toUpperCase()+raw.slice(1);
+}
+
+// Retry automático para detectar faixas que demoram a aparecer
+var _audioRetryTimer=null;
+function buildAudioMenu(retries){
+  retries=retries||0;
   var list=document.getElementById('audio-list');
   if(!list)return;
-  list.innerHTML='';
-  var v=document.getElementById('player-video')||document.getElementById('pl-video');
+  var v=document.getElementById('player-video');
+  var hlsRef=hls||null;
+  var found=false;
 
-  // ── Try HLS.js audio tracks first
-  var hlsRef=hlsP||hls||null;
-  if(hlsRef && hlsRef.audioTracks && hlsRef.audioTracks.length){
-    var tracks=hlsRef.audioTracks, cur=hlsRef.audioTrack;
+  // ── 1) Faixas HLS.js
+  if(hlsRef&&hlsRef.audioTracks&&hlsRef.audioTracks.length>1){
+    list.innerHTML='';
+    var tracks=hlsRef.audioTracks,cur=hlsRef.audioTrack;
     tracks.forEach(function(t,i){
+      var label=_langLabel(t)||('Faixa '+(i+1));
       var row=document.createElement('div');
       row.className='audio-row'+(i===cur?' active':'');
-      var lang=t.name||t.lang||t.groupId||('Faixa '+(i+1));
-      row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
+      row.innerHTML='<span class="audio-dot"></span><span>'+esc(label)+'</span>';
       row.onclick=(function(idx,name){return function(){
-        var h2=hlsP||hls;if(h2){h2.audioTrack=idx;}
+        var h=hls;if(h){h.audioTrack=idx;}
         buildAudioMenu();toast('🎵 '+name);hideAudioMenu();
-      };})(i,lang);
+      };})(i,label);
       list.appendChild(row);
     });
-    return;
+    // Botão forçar faixa 0 se sem áudio
+    _addSilentFix(list,hlsRef);
+    found=true;
   }
 
-  // ── Try native HTMLVideoElement audio tracks (Firefox, Safari, alguns MP4)
-  if(v && v.audioTracks && v.audioTracks.length > 0){
+  // ── 2) Faixas nativas (Firefox, Safari, alguns MP4/MKV)
+  if(!found&&v&&v.audioTracks&&v.audioTracks.length>1){
+    list.innerHTML='';
     var nTracks=v.audioTracks;
     for(var i=0;i<nTracks.length;i++){
       (function(idx){
         var t=nTracks[idx];
+        var label=_langLabel(t)||t.label||('Faixa '+(idx+1));
         var row=document.createElement('div');
         row.className='audio-row'+(t.enabled?' active':'');
-        var lang=t.label||t.language||('Faixa '+(idx+1));
-        row.innerHTML='<span class="audio-dot"></span><span>'+esc(lang)+'</span>';
+        row.innerHTML='<span class="audio-dot"></span><span>'+esc(label)+'</span>';
         row.onclick=function(){
-          // Disable all, enable selected
-          for(var j=0;j<nTracks.length;j++) nTracks[j].enabled=false;
+          for(var j=0;j<nTracks.length;j++)nTracks[j].enabled=false;
           nTracks[idx].enabled=true;
-          buildAudioMenu();toast('🎵 '+lang);hideAudioMenu();
+          buildAudioMenu();toast('🎵 '+label);hideAudioMenu();
         };
         list.appendChild(row);
       })(i);
     }
-    return;
+    found=true;
   }
 
-  // ── No multiple tracks found — show info message
-  var row=document.createElement('div');
-  row.className='audio-row';
-  row.style.opacity='0.55';row.style.cursor='default';
-  row.innerHTML='<span class="audio-dot"></span><span>Faixa única / sem seleção</span>';
-  list.appendChild(row);
+  // ── 3) Nenhuma faixa múltipla — mostra opções de reparo
+  if(!found){
+    // Tenta de novo em até 3x (faixas podem demorar a carregar)
+    if(retries<3){
+      clearTimeout(_audioRetryTimer);
+      _audioRetryTimer=setTimeout(function(){buildAudioMenu(retries+1);},1500);
+    }
+    list.innerHTML='';
+    var row=document.createElement('div');
+    row.className='audio-row';row.style.opacity='0.6';row.style.cursor='default';
+    row.innerHTML='<span class="audio-dot"></span><span>'+(retries<3?'⏳ Detectando faixas...':'Faixa única detectada')+'</span>';
+    list.appendChild(row);
+    // Dica de reparo de áudio silencioso
+    if(retries>=3){_addSilentFix(list,hlsRef);}
+  }
+}
 
-  // Also show tip for files without audio
-  var tip=document.createElement('div');
-  tip.style.cssText='padding:10px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);line-height:1.5;';
-  tip.textContent='Se o vídeo está sem áudio, tente outra qualidade ou formato no servidor.';
-  list.appendChild(tip);
+function _addSilentFix(list,hlsRef){
+  // Se estiver sem áudio, botão para forçar restart da faixa
+  var fix=document.createElement('div');
+  fix.style.cssText='padding:10px 16px;border-top:1px solid var(--border);';
+  fix.innerHTML='<button onclick="_fixAudio()" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;color:var(--text);font-size:12px;cursor:pointer;width:100%">🔧 Sem áudio? Clique para reparar</button>';
+  list.appendChild(fix);
+}
+function _fixAudio(){
+  var v=document.getElementById('player-video');
+  var hlsRef=hls;
+  if(hlsRef&&hlsRef.audioTracks&&hlsRef.audioTracks.length){
+    // Tenta cada faixa até encontrar uma com áudio
+    var cur=hlsRef.audioTrack;
+    var next=(cur+1)%hlsRef.audioTracks.length;
+    hlsRef.audioTrack=next;
+    toast('🎵 Tentando faixa '+(next+1)+'...');
+    buildAudioMenu();
+  } else if(v){
+    // Para MP4: tenta recarregar o ponto atual
+    var t=v.currentTime;
+    v.load();
+    v.currentTime=t;
+    v.play().catch(()=>{});
+    toast('🔧 Áudio reiniciado');
+  }
+  hideAudioMenu();
 }
 function toggleAudioMenu(){
   var m=document.getElementById('audio-menu');
